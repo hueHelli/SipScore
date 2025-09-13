@@ -6,15 +6,6 @@ const cookie = require("../session");
 
 login.use(cookie);
 
-login.get("/", async (req, res) => {
-  try {
-    res.send("Welcome to the login API!");
-  } catch (error) {
-    console.error("Error occurred:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 login.post("/loginUser", async (req, res) => {
   const { email, username, password } = req.body;
 
@@ -41,11 +32,11 @@ login.post("/loginUser", async (req, res) => {
       return res
         .status(401)
         .json({ error: "Invalid email, username or password" });
-    } else if (!user[0].Verified) {
+    } else if (!user[0].Verifiziert) {
       return res.status(403).json({ error: "Email not verified" });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, user[0].Password);
+    const isPasswordValid = bcrypt.compareSync(password, user[0].Passwort);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
@@ -53,7 +44,7 @@ login.post("/loginUser", async (req, res) => {
     res.json({ message: "Login successful", user: user[0] });
   } catch (error) {
     console.error("Error occurred:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
 });
 

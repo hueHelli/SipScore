@@ -13,15 +13,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-signup.get("/", async (req, res) => {
-  try {
-    res.send("Welcome to the signup API!");
-  } catch (error) {
-    console.error("Error occurred:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 signup.post("/newUser", async (req, res) => {
   const { firstName, lastName, email, username, password } = req.body;
 
@@ -60,7 +51,7 @@ signup.post("/newUser", async (req, res) => {
         INSERT INTO Benutzer
         (Vorname, Nachname, Email, Benutzername, Passwort, Rolle, Code, Verifiziert)
         VALUES
-        (?, ?, ?, ?, ?, 11, ?, FALSE)
+        (?, ?, ?, ?, ?, b'11', ?, FALSE)
         `,
       [firstName, lastName, email, username, password, code]
     );
