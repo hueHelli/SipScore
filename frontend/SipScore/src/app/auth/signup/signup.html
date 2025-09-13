@@ -1,1 +1,47 @@
-<p>signup works!</p>
+<div class="main">
+  <div class="card">
+    <form [formGroup]="signupForm" class="form">
+      <h3>Anmelden</h3>
+      <input
+        type="text"
+        placeholder="Vorname"
+        required
+        formControlName="firstName"
+      />
+      <input
+        type="text"
+        placeholder="Nachname"
+        required
+        formControlName="lastName"
+      />
+      <input
+        type="text"
+        placeholder="Benutzername"
+        required
+        formControlName="username"
+      />
+      <input
+        type="email"
+        placeholder="E-Mail"
+        required
+        formControlName="email"
+      />
+      <input
+        type="password"
+        placeholder="Passwort"
+        required
+        formControlName="password"
+        title="Mindestens 8 Zeichen"
+      />
+      <input
+        type="password"
+        placeholder="Passwort bestätigen"
+        required
+        formControlName="confirmPassword"
+      />
+      <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+      <button type="submit" (click)="onSubmit()">Account erstellen</button>
+    </form>
+    <button class="btn secondary" (click)="goToLogin()">Anmelden</button>
+  </div>
+</div>
