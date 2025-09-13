@@ -75,7 +75,7 @@ signup.post("/newUser", async (req, res) => {
     res.status(201).json({ message: "User created temporarily", verification });
   } catch (error) {
     console.error("Error inserting user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: "Internal Server Error: " + error });
   }
 });
 
