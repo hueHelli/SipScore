@@ -1,0 +1,13 @@
+.nav-main {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 10px;
+  height: 80px;
+  width: 100%;
+  background-color: var(--nav-color);
+
+  .end {
+    align-self: flex-end;
+  }
+}
