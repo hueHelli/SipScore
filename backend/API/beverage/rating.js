@@ -2,7 +2,7 @@ const express = require("express");
 const rating = express.Router();
 const pool = require("../pool");
 
-rating.get("beverage/:id/rating", async (req, res) => {
+rating.get("beverages/:id/rating", async (req, res) => {
   const id = req.params.id;
   const { page = 1, pageSize = 20, sort = "Datum", order = "DESC" } = req.query;
 

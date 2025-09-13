@@ -345,8 +345,65 @@
           "500": { "description": "Server error" }
         }
       }
+    },"/beverages/best": {
+      "get": {
+        "tags": ["Beverage"],
+        "summary": "Get best beverages by type",
+        "description": "Returns the beverage with the best average rating for each type. Only accessible for authenticated users.",
+        "responses": {
+          "200": {
+            "description": "Best beverages per type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Typ_Id": { "type": "integer" },
+                      "Typ": { "type": "string" },
+                      "Getraenk_Id": { "type": "integer" },
+                      "Beschreibung": { "type": "string" },
+                      "Durchschnittsbewertung": { "type": "number" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
     },
-    "/beverage/{id}/rating": {
+    "/beverages/{id}": {
+      "get": {
+        "tags": ["Beverage"],
+        "summary": "Get beverage by ID",
+        "description": "Returns a single beverage by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the beverage",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beverage found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Beverage" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Beverage not found" }
+        }
+      }
+    }, 
+    "/beverages/{id}/rating": {
       "get": {
         "tags": ["Rating"],
         "summary": "Get ratings for a beverage",
