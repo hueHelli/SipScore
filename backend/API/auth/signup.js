@@ -13,16 +13,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-signup.get("/", async (req, res) => {
-  try {
-    res.send("Welcome to the signup API!");
-  } catch (error) {
-    console.error("Error occurred:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-signup.post("/newUser", async (req, res) => {
+signup.post("/user", async (req, res) => {
   const { firstName, lastName, email, username, password } = req.body;
 
   const passwordHash = bcrypt.hashSync(password, 10);
@@ -39,6 +30,12 @@ signup.post("/newUser", async (req, res) => {
     );
 
     if (existingEmail.length > 0) {
+      if (existingEmail[0].Geloescht) {
+        return res.status(403).json({
+          error:
+            "This account has been banned or deleted. Please contact support if you think this is a mistake.",
+        });
+      }
       return res.status(409).json({ error: "Email already in use" });
     }
 
@@ -52,6 +49,12 @@ signup.post("/newUser", async (req, res) => {
     );
 
     if (existingUsername.length > 0) {
+      if (existingEmail[0].Geloescht) {
+        return res.status(403).json({
+          error:
+            "This account has been banned or deleted. Please contact support if you think this is a mistake.",
+        });
+      }
       return res.status(409).json({ error: "Username already exists" });
     }
 
@@ -60,7 +63,7 @@ signup.post("/newUser", async (req, res) => {
         INSERT INTO Benutzer
         (Vorname, Nachname, Email, Benutzername, Passwort, Rolle, Code, Verifiziert)
         VALUES
-        (?, ?, ?, ?, ?, 11, ?, FALSE)
+        (?, ?, ?, ?, ?, b'11', ?, FALSE)
         `,
       [firstName, lastName, email, username, password, code]
     );
@@ -75,11 +78,11 @@ signup.post("/newUser", async (req, res) => {
     res.status(201).json({ message: "User created temporarily", verification });
   } catch (error) {
     console.error("Error inserting user:", error);
-    res.status(500).json({ error: "Internal Server Error: " + error });
+    res.status(500).json({ error: `We fucked up:  ${error.message}` });
   }
 });
 
-signup.put("/confirm", async (req, res) => {
+signup.put("/user", async (req, res) => {
   const { email, code } = req.body;
 
   try {
@@ -89,12 +92,15 @@ signup.put("/confirm", async (req, res) => {
         WHERE Email = ?
         AND Code = ?
         AND Verified = FALSE
+        AND Geloescht = FALSE
       `,
       [email, code]
     );
 
     if (user.length === 0) {
-      return res.status(400).json({ error: "Invalid code or email" });
+      return res
+        .status(400)
+        .json({ error: "You fucked up: Invalid Code or Email" });
     }
 
     await pool.query(
@@ -108,8 +114,26 @@ signup.put("/confirm", async (req, res) => {
 
     res.status(200).json({ message: "Email verified successfully" });
   } catch (error) {
-    console.error("Error verifying user:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
+signup.delete("/user/:id", async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    await pool.query(
+      `
+      UPDATE Benutzer
+      SET Geloescht = TRUE
+      WHERE Benutzer_Id = ?
+      `,
+      [userId]
+    );
+
+    resume.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
 });
 

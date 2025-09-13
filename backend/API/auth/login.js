@@ -6,16 +6,7 @@ const cookie = require("../session");
 
 login.use(cookie);
 
-login.get("/", async (req, res) => {
-  try {
-    res.send("Welcome to the login API!");
-  } catch (error) {
-    console.error("Error occurred:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-login.post("/loginUser", async (req, res) => {
+login.post("/session", async (req, res) => {
   const { email, username, password } = req.body;
 
   try {
@@ -24,14 +15,18 @@ login.post("/loginUser", async (req, res) => {
     if (email) {
       [user] = await pool.query(
         `
-      SELECT * FROM Benutzer WHERE Email = ?
-      `,
+        SELECT * FROM Benutzer
+        WHERE Email = ?
+        AND Geloescht = 0
+        `,
         [email]
       );
     } else if (username) {
       [user] = await pool.query(
         `
-        SELECT * FROM Benutzer WHERE Benutzername = ?
+        SELECT * FROM Benutzer
+        WHERE Benutzername = ?
+        AND Geloescht = 0
         `,
         [username]
       );
@@ -41,11 +36,11 @@ login.post("/loginUser", async (req, res) => {
       return res
         .status(401)
         .json({ error: "Invalid email, username or password" });
-    } else if (!user[0].Verified) {
+    } else if (!user[0].Verifiziert) {
       return res.status(403).json({ error: "Email not verified" });
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, user[0].Password);
+    const isPasswordValid = bcrypt.compareSync(password, user[0].Passwort);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
@@ -53,25 +48,25 @@ login.post("/loginUser", async (req, res) => {
     res.json({ message: "Login successful", user: user[0] });
   } catch (error) {
     console.error("Error occurred:", error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
 });
 
 login.get("/session", async (req, res) => {
-  if (req.session.user) {
-    res.json({ user: req.session.user });
+  if (req.session.user && !req.session.user.Geloescht) {
+    res.status(200).json({ user: req.session.user });
   } else {
-    res.status(401).json({ error: "Unauthorized" });
+    res.status(401).json({ error: "There is no Session currently active" });
   }
 });
 
-login.get("/logout", async (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
+login.delete("/session", async (req, res) => {
+  req.session.destroy((error) => {
+    if (error) {
       console.error("Error occurred during logout:", err);
-      return res.status(500).json({ error: "Internal Server Error" });
+      return res.status(500).json({ error: `We fucked up: ${error.message}` });
     }
-    res.json({ message: "Logout successful" });
+    res.status(200).json({ message: "Logout successful" });
   });
 });
 
