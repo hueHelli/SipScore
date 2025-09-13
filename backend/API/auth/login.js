@@ -7,7 +7,15 @@ const cookie = require("../session");
 login.use(cookie);
 
 login.post("/session", async (req, res) => {
-  const { email, username, password } = req.body;
+  const { credential, password } = req.body;
+
+  let email = null;
+  let username = null;
+  if (credential && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(credential)) {
+    email = credential;
+  } else {
+    username = credential;
+  }
 
   try {
     let user;
@@ -44,6 +52,7 @@ login.post("/session", async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Invalid email or password" });
     }
+    delete user[0].Passwort;
     req.session.user = user[0];
     res.json({ message: "Login successful", user: user[0] });
   } catch (error) {
