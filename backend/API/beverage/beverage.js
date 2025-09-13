@@ -3,7 +3,7 @@ const beverage = express.Router();
 const pool = require("../pool");
 
 beverage.get("/beverages", async (req, res) => {
-  // Example-URL: /beverages?Typ_Id=1,2&Geschmack_Id=3&Min_Alter=5&Max_Alter=24&Min_Alkohol=5&Max_Alkohol=10&Auf_Lager=true&page=1&pageSize=5
+  // Example-URL: /beverages?Typ_Id=1,2&Geschmack_Id=3&Min_Alter=5&Max_Alter=24&Min_Alkohol=5&Max_Alkohol=10&Auf_Lager=true&page=1&pageSize=5&sort=Alkoholgehalt&order=DESC
   const {
     Typ_Id,
     Geschmack_Id,
@@ -87,7 +87,7 @@ beverage.get("/beverages", async (req, res) => {
     LEFT JOIN Geschmack gs ON gg.Geschmack_Id = gs.Geschmack_Id
     ${whereSQL}
     GROUP BY g.Getraenk_Id
-    ORDER BY ${sort} ${order === "DESC" ? "DESC" : "ASC"}
+    ORDER BY ${sort} ${order}
     LIMIT ? OFFSET ?
   `;
 
