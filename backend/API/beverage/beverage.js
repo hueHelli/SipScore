@@ -126,10 +126,97 @@ beverage.get("/beverages/:id", async (req, res) => {
     );
 
     if (!rows) {
-      return res.status(404).json({ error: "Getränk nicht gefunden" });
+      return res.status(404).json({ error: "Beverage not found" });
     }
 
     return res.status(200).json(rows[0]);
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
+beverage.post("/beverages", async (req, res) => {
+  const {
+    Typ_Id,
+    Startgravitation,
+    BeginnFermentation,
+    Abfuellung,
+    Alkoholgehalt,
+    Lager,
+    Beschreibung,
+    Geschmack_Ids, // Array of numbers
+  } = req.body;
+
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+
+    if (req.session.user.Rolle.data[0] !== 1) {
+      return res.status(403).json({ error: "I know who you are, but no" });
+    }
+
+    const [type] = await pool.query(
+      `
+      SELECT * FROM Typ
+      WHERE Typ_Id = ?
+      AND Geloescht = FALSE
+      `,
+      [Typ_Id]
+    );
+
+    if (!type) {
+      return res.status(404).json({ error: "Type not found" });
+    }
+
+    const [result] = await pool.query(
+      `
+      INSERT INTO Getraenk
+      (Typ_Id, Startgravitation, BeginnFermentation, Abfuellung, Alkoholgehalt, Lager, Beschreibung)
+      VALUES
+      (?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        Typ_Id,
+        Startgravitation,
+        BeginnFermentation,
+        Abfuellung,
+        Alkoholgehalt,
+        Lager,
+        Beschreibung,
+      ]
+    );
+
+    for (const geschmack_Id of Geschmack_Ids) {
+      const [flavor] = await pool.query(
+        `
+        SELECT * FROM Geschmack
+        WHERE Geschmack_Id = ?
+        AND Geloescht = FALSE
+        `,
+        [geschmack_Id]
+      );
+
+      if (!flavor) {
+        return res.status(404).json({
+          error: `Flavor not found, seriously how tf did you do this, this should not be possible, like I am genuinely curious`,
+        });
+      } else {
+        await pool.query(
+          `
+          INSERT INTO Getraenk_Geschmack
+          (Getraenk_Id, Geschmack_Id)
+          VALUES
+          (?, ?)
+          `,
+          [result.insertId, geschmack_Id]
+        );
+      }
+    }
+
+    return res
+      .status(201)
+      .json({ message: "Beverage created", id: result.insertId });
   } catch (error) {
     return res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
