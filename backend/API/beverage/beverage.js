@@ -3,7 +3,7 @@ const beverage = express.Router();
 const pool = require("../pool");
 
 beverage.get("/beverages", async (req, res) => {
-  // Example-URL: /beverages?Typ_Id=1,2&Geschmack_Id=3&Min_Alter=5&Max_Alkohol=10&Auf_Lager=true&page=1&pageSize=5
+  // Example-URL: /beverages?Typ_Id=1,2&Geschmack_Id=3&Min_Alter=5&Max_Alter=24&Min_Alkohol=5&Max_Alkohol=10&Auf_Lager=true&page=1&pageSize=5
   const {
     Typ_Id,
     Geschmack_Id,

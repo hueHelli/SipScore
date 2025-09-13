@@ -1,0 +1,323 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "SipScore API",
+    "version": "1.0.0",
+    "description": "API documentation for SipScore application"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local server"
+    }
+  ],
+  "tags": [
+    { "name": "Session", "description": "Session management" },
+    { "name": "User", "description": "User registration and management" },
+    { "name": "Role", "description": "User role management" },
+    { "name": "Beverage", "description": "Beverage queries" }
+  ],
+  "paths": {
+    "/session": {
+      "post": {
+        "tags": ["Session"],
+        "summary": "Login",
+        "description": "Authenticate user and start session.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "credential": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["credential", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials" },
+          "403": { "description": "Email not verified" }
+        }
+      },
+      "get": {
+        "tags": ["Session"],
+        "summary": "Get session user",
+        "description": "Returns the current session user.",
+        "responses": {
+          "200": {
+            "description": "Session active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "No session active" }
+        }
+      },
+      "delete": {
+        "tags": ["Session"],
+        "summary": "Logout",
+        "description": "Destroys the current session.",
+        "responses": {
+          "200": { "description": "Logout successful" },
+          "500": { "description": "Logout failed" }
+        }
+      }
+    },
+    "/user": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Signup",
+        "description": "Create a new user and send verification code.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": { "type": "string" },
+                  "lastName": { "type": "string" },
+                  "email": { "type": "string" },
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                },
+                "required": ["firstName", "lastName", "email", "username", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created, verification sent" },
+          "400": { "description": "Invalid email format" },
+          "409": { "description": "Email or username already in use" }
+        }
+      },
+      "put": {
+        "tags": ["User"],
+        "summary": "Verify user email",
+        "description": "Verify user email with code.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "code": { "type": "string" }
+                },
+                "required": ["email", "code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Email verified" },
+          "400": { "description": "Invalid code or email" }
+        }
+      }
+    },
+    "/user/{id}": {
+      "delete": {
+        "tags": ["User"],
+        "summary": "Delete user",
+        "description": "Soft delete user by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "User deleted" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/role/{id}": {
+      "put": {
+        "tags": ["Role"],
+        "summary": "Promote user role",
+        "description": "Change the role of a user (admin only).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "newRole": { "type": "integer", "minimum": 0, "maximum": 3 }
+                },
+                "required": ["newRole"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "User role updated" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "User not found" },
+          "400": { "description": "Invalid role specified" }
+        }
+      }
+    },
+    "/beverages": {
+      "get": {
+        "tags": ["Beverage"],
+        "summary": "Get filtered beverages",
+        "description": "Returns a filtered list of beverages. All filters are optional.",
+        "parameters": [
+          {
+            "name": "Typ_Id",
+            "in": "query",
+            "description": "Comma separated Typ IDs",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "Geschmack_Id",
+            "in": "query",
+            "description": "Comma separated Geschmack IDs",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "Min_Alter",
+            "in": "query",
+            "description": "Minimum age in months",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "Max_Alter",
+            "in": "query",
+            "description": "Maximum age in months",
+            "schema": { "type": "integer" }
+          },
+          {
+            "name": "Min_Alkohol",
+            "in": "query",
+            "description": "Minimum alcohol content",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "Max_Alkohol",
+            "in": "query",
+            "description": "Maximum alcohol content",
+            "schema": { "type": "number" }
+          },
+          {
+            "name": "Auf_Lager",
+            "in": "query",
+            "description": "true for in stock, false for out of stock",
+            "schema": { "type": "string", "enum": ["true", "false"] }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "schema": { "type": "integer", "default": 20 }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort field",
+            "schema": { "type": "string", "default": "Getraenk_Id" }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Sort order",
+            "schema": { "type": "string", "enum": ["ASC", "DESC"], "default": "ASC" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Filtered beverage list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Beverage" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "Benutzer_Id": { "type": "integer" },
+          "Vorname": { "type": "string" },
+          "Nachname": { "type": "string" },
+          "Email": { "type": "string" },
+          "Benutzername": { "type": "string" },
+          "Rolle": { "type": "string" },
+          "Verifiziert": { "type": "boolean" },
+          "Geloescht": { "type": "boolean" }
+        }
+      },
+      "Beverage": {
+        "type": "object",
+        "properties": {
+          "Getraenk_Id": { "type": "integer" },
+          "Typ_Id": { "type": "integer" },
+          "Startgravitation": { "type": "number" },
+          "BeginnFermentation": { "type": "string", "format": "date" },
+          "Abfuellung": { "type": "string", "format": "date" },
+          "Alkoholgehalt": { "type": "number" },
+          "Lager": { "type": "integer" },
+          "Beschreibung": { "type": "string" },
+          "Geloescht": { "type": "boolean" },
+          "Typ": { "type": "string" },
+          "Geschmaecker": { "type": "string" }
+        }
+      }
+    }
+  }
+}

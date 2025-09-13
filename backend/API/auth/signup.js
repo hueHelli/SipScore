@@ -20,6 +20,12 @@ signup.post("/user", async (req, res) => {
   const code = crypto.randomInt(100000, 999999).toString();
 
   try {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res
+        .status(400)
+        .json({ error: "You fucked up: Invalid Email Format" });
+    }
+
     const [existingEmail] = await pool.query(
       `
         SELECT * FROM Benutzer
@@ -65,7 +71,7 @@ signup.post("/user", async (req, res) => {
         VALUES
         (?, ?, ?, ?, ?, b'11', ?, FALSE)
         `,
-      [firstName, lastName, email, username, password, code]
+      [firstName, lastName, email, username, passwordHash, code]
     );
 
     await transporter.sendMail({
