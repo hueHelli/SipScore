@@ -13,13 +13,16 @@ promote.put("/role/:id", async (req, res) => {
     } else if (currentUser.Rolle.data[0] !== 0) {
       return res.status(403).json({ error: "I know who you are, but no" });
     } else if (newRole < 0 || newRole > 3) {
-      return res.status(400).json({ error: "Invalid role specified" });
+      return res
+        .status(400)
+        .json({ error: "You fucked up: Invalid role specified" });
     }
 
     const [result] = await pool.query(
       `
       SELECT * FROM Benutzer
       WHERE Benutzer_Id = ?
+      AND Geloescht = 0
       `,
       [userId]
     );

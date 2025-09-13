@@ -1,0 +1,107 @@
+const express = require("express");
+const beverage = express.Router();
+const pool = require("../pool");
+
+beverage.get("/beverages", async (req, res) => {
+  // Example-URL: /beverages?Typ_Id=1,2&Geschmack_Id=3&Min_Alter=5&Max_Alkohol=10&Auf_Lager=true&page=1&pageSize=5
+  const {
+    Typ_Id,
+    Geschmack_Id,
+    Min_Alter,
+    Max_Alter,
+    Min_Alkohol,
+    Max_Alkohol,
+    Auf_Lager,
+    Page = 1,
+    PageSize = 20,
+    sort = "Getraenk_Id",
+    order = "ASC",
+  } = req.query;
+
+  let whereClauses = [];
+  let params = [];
+
+  // Typ Filter
+  if (Typ_Id) {
+    const typArr = Typ_Id.split(",")
+      .map(Number)
+      .filter((n) => !isNaN(n));
+    if (typArr.length > 0) {
+      whereClauses.push(`g.Typ_Id IN (${typArr.map(() => "?").join(",")})`);
+      params.push(...typArr);
+    }
+  }
+
+  // Geschmack Filter
+  if (Geschmack_Id) {
+    const geschmackArr = Geschmack_Id.split(",")
+      .map(Number)
+      .filter((n) => !isNaN(n));
+    if (geschmackArr.length > 0) {
+      whereClauses.push(
+        `gg.Geschmack_Id IN (${geschmackArr.map(() => "?").join(",")})`
+      );
+      params.push(...geschmackArr);
+    }
+  }
+
+  // Alter Filter (Monate)
+  if (Min_Alter != null) {
+    whereClauses.push(`TIMESTAMPDIFF(MONTH, g.Abfuellung, CURDATE()) >= ?`);
+    params.push(Number(Min_Alter));
+  }
+  if (Max_Alter != null) {
+    whereClauses.push(`TIMESTAMPDIFF(MONTH, g.Abfuellung, CURDATE()) <= ?`);
+    params.push(Number(Max_Alter));
+  }
+
+  // Alkohol Filter
+  if (Min_Alkohol != null) {
+    whereClauses.push(`g.Alkoholgehalt >= ?`);
+    params.push(Number(Min_Alkohol));
+  }
+  if (Max_Alkohol != null) {
+    whereClauses.push(`g.Alkoholgehalt <= ?`);
+    params.push(Number(Max_Alkohol));
+  }
+
+  // Lager Filter
+  if (Auf_Lager != null) {
+    whereClauses.push(`g.Lager ${Auf_Lager === "true" ? ">" : "="} 0`);
+  }
+
+  // Nicht gelöschte Getränke
+  whereClauses.push(`g.Geloescht = FALSE`);
+
+  // SQL Query
+  const whereSQL = whereClauses.length
+    ? "WHERE " + whereClauses.join(" AND ")
+    : "";
+  const offset = (Number(Page) - 1) * Number(PageSize);
+
+  const sql = `
+    SELECT g.*, t.Typ, GROUP_CONCAT(DISTINCT gs.Geschmack) AS Geschmaecker
+    FROM Getraenk g
+    JOIN Typ t ON g.Typ_Id = t.Typ_Id
+    LEFT JOIN Getraenk_Geschmack gg ON g.Getraenk_Id = gg.Getraenk_Id
+    LEFT JOIN Geschmack gs ON gg.Geschmack_Id = gs.Geschmack_Id
+    ${whereSQL}
+    GROUP BY g.Getraenk_Id
+    ORDER BY ${sort} ${order === "DESC" ? "DESC" : "ASC"}
+    LIMIT ? OFFSET ?
+  `;
+
+  params.push(Number(PageSize), offset);
+
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+    const [rows] = await pool.query(sql, params);
+    res.status(200).json(rows);
+  } catch (error) {
+    res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
+module.exports = beverage;

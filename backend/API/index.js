@@ -4,6 +4,7 @@ const cors = require("cors");
 const login = require("./auth/login");
 const signup = require("./auth/signup");
 const promote = require("./auth/promote");
+const beverage = require("./beverage/beverage");
 const bcrypt = require("bcrypt");
 
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(
 app.use("/api", login);
 app.use("/api", signup);
 app.use("/api", promote);
+app.use("/api", beverage);
 
 app.get("/api", (req, res) => {
   res.send("Welcome to the API!");
