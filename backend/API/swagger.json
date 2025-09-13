@@ -285,37 +285,32 @@
           "401": { "description": "Unauthorized" }
         }
       }
-    }
-  },
-  "components": {
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "Benutzer_Id": { "type": "integer" },
-          "Vorname": { "type": "string" },
-          "Nachname": { "type": "string" },
-          "Email": { "type": "string" },
-          "Benutzername": { "type": "string" },
-          "Rolle": { "type": "string" },
-          "Verifiziert": { "type": "boolean" },
-          "Geloescht": { "type": "boolean" }
-        }
-      },
-      "Beverage": {
-        "type": "object",
-        "properties": {
-          "Getraenk_Id": { "type": "integer" },
-          "Typ_Id": { "type": "integer" },
-          "Startgravitation": { "type": "number" },
-          "BeginnFermentation": { "type": "string", "format": "date" },
-          "Abfuellung": { "type": "string", "format": "date" },
-          "Alkoholgehalt": { "type": "number" },
-          "Lager": { "type": "integer" },
-          "Beschreibung": { "type": "string" },
-          "Geloescht": { "type": "boolean" },
-          "Typ": { "type": "string" },
-          "Geschmaecker": { "type": "string" }
+    },
+    "/beverages/{id}": {
+      "get": {
+        "tags": ["Beverage"],
+        "summary": "Get beverage by ID",
+        "description": "Returns a single beverage by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the beverage",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Beverage found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Beverage" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Beverage not found" }
         }
       }
     }

@@ -98,9 +98,40 @@ beverage.get("/beverages", async (req, res) => {
       return res.status(401).json({ error: "I don't know who you are" });
     }
     const [rows] = await pool.query(sql, params);
-    res.status(200).json(rows);
+    return res.status(200).json(rows);
   } catch (error) {
-    res.status(500).json({ error: `We fucked up: ${error.message}` });
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
+beverage.get("/beverages/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+
+    const [rows] = await pool.query(
+      `
+      SELECT Getraenk.Getraenk_Id, Typ.Typ, Startgravitation, BeginnFermentation, Abfuellung, Alkoholgehalt, Lager, Beschreibung, GROUP_CONCAT(Geschmack.Geschmack) AS Geschmaecker
+      FROM Getraenk
+      JOIN Typ ON Getraenk.Typ_Id = Typ.Typ_Id
+      LEFT JOIN Getraenk_Geschmack ON Getraenk.Getraenk_Id = Getraenk_Geschmack.Getraenk_Id
+      LEFT JOIN Geschmack ON Getraenk_Geschmack.Geschmack_Id = Geschmack.Geschmack_Id
+      WHERE Getraenk.Getraenk_Id = ?
+      AND Getraenk.Geloescht = FALSE
+      `,
+      [id]
+    );
+
+    if (!rows) {
+      return res.status(404).json({ error: "Getränk nicht gefunden" });
+    }
+
+    return res.status(200).json(rows[0]);
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
 });
 
