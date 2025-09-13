@@ -284,38 +284,64 @@
           },
           "401": { "description": "Unauthorized" }
         }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "Benutzer_Id": { "type": "integer" },
-          "Vorname": { "type": "string" },
-          "Nachname": { "type": "string" },
-          "Email": { "type": "string" },
-          "Benutzername": { "type": "string" },
-          "Rolle": { "type": "string" },
-          "Verifiziert": { "type": "boolean" },
-          "Geloescht": { "type": "boolean" }
-        }
       },
-      "Beverage": {
-        "type": "object",
-        "properties": {
-          "Getraenk_Id": { "type": "integer" },
-          "Typ_Id": { "type": "integer" },
-          "Startgravitation": { "type": "number" },
-          "BeginnFermentation": { "type": "string", "format": "date" },
-          "Abfuellung": { "type": "string", "format": "date" },
-          "Alkoholgehalt": { "type": "number" },
-          "Lager": { "type": "integer" },
-          "Beschreibung": { "type": "string" },
-          "Geloescht": { "type": "boolean" },
-          "Typ": { "type": "string" },
-          "Geschmaecker": { "type": "string" }
+      "post": {
+        "tags": ["Beverage"],
+        "summary": "Create a new beverage",
+        "description": "Creates a new beverage. Only users with role 'Brauer' (1) are allowed.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Typ_Id": { "type": "integer" },
+                  "Startgravitation": { "type": "number" },
+                  "BeginnFermentation": { "type": "string", "format": "date" },
+                  "Abfuellung": { "type": "string", "format": "date" },
+                  "Alkoholgehalt": { "type": "number" },
+                  "Lager": { "type": "integer" },
+                  "Beschreibung": { "type": "string" },
+                  "Geschmack_Ids": {
+                    "type": "array",
+                    "items": { "type": "integer" },
+                    "description": "Array of Geschmack IDs"
+                  }
+                },
+                "required": [
+                  "Typ_Id",
+                  "Startgravitation",
+                  "BeginnFermentation",
+                  "Abfuellung",
+                  "Alkoholgehalt",
+                  "Lager",
+                  "Beschreibung",
+                  "Geschmack_Ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Beverage created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "id": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Type or flavor not found" },
+          "500": { "description": "Server error" }
         }
       }
     }

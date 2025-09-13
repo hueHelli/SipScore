@@ -40,7 +40,7 @@ login.post("/session", async (req, res) => {
       );
     }
 
-    if (user.length === 0) {
+    if (!user) {
       return res
         .status(401)
         .json({ error: "Invalid email, username or password" });
