@@ -480,6 +480,27 @@
           "404": { "description": "Beverage, type or flavor not found" },
           "500": { "description": "Server error" }
         }
+      },
+      "delete": {
+        "tags": ["Beverage"],
+        "summary": "Delete beverage",
+        "description": "Soft deletes a beverage by its ID. Only users with role 'Brauer' (1) are allowed.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the beverage",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Beverage deleted" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Beverage not found" },
+          "500": { "description": "Server error" }
+        }
       }
     },
     "/beverages/{id}/rating": {
