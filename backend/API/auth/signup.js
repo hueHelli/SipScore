@@ -30,7 +30,7 @@ signup.post("/user", async (req, res) => {
       `
         SELECT * FROM Benutzer
         WHERE Email = ?
-        AND Verified = TRUE
+        AND Verifiziert = TRUE
       `,
       [email]
     );
@@ -48,8 +48,8 @@ signup.post("/user", async (req, res) => {
     const [existingUsername] = await pool.query(
       `
         SELECT * FROM Benutzer
-        WHERE Username = ?
-        AND Verified = TRUE
+        WHERE Benutzername = ?
+        AND Verifiziert = TRUE
       `,
       [username]
     );
@@ -97,7 +97,7 @@ signup.put("/user", async (req, res) => {
         SELECT * FROM Benutzer
         WHERE Email = ?
         AND Code = ?
-        AND Verified = FALSE
+        AND Verifiziert = FALSE
         AND Geloescht = FALSE
       `,
       [email, code]
@@ -111,8 +111,8 @@ signup.put("/user", async (req, res) => {
 
     await pool.query(
       `
-        UPDATE User
-        SET Verified = TRUE, Code = NULL
+        UPDATE Benutzer
+        SET Verifiziert = TRUE, Code = NULL
         WHERE Email = ?
       `,
       [email]

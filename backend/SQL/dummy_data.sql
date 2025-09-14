@@ -107,3 +107,158 @@ VALUES (1, 1), -- Bier, süß
     (5, 3), -- Cider, fruchtig
     (5, 1);
 -- Cider, süß
+
+-- Bewertungen für Getränk 1 (Helles Bier, süß und fruchtig) - Durchschnitt: 4.0
+INSERT INTO
+    Bewertung (
+        Getraenk_Id,
+        Benutzer_Id,
+        Bewertung,
+        Kommentar,
+        Datum
+    )
+VALUES (
+        1,
+        1,
+        5,
+        'Sehr erfrischend und lecker!',
+        '2024-03-10'
+    ),
+    (
+        1,
+        2,
+        4,
+        'Guter Geschmack, könnte etwas herber sein.',
+        '2024-03-12'
+    ),
+    (
+        1,
+        1,
+        3,
+        'Nicht ganz mein Fall, aber ok.',
+        '2024-03-15'
+    );
+
+-- Bewertungen für Getränk 2 (Dunkles Bier, herb) - Durchschnitt: 3.0
+INSERT INTO
+    Bewertung (
+        Getraenk_Id,
+        Benutzer_Id,
+        Bewertung,
+        Kommentar,
+        Datum
+    )
+VALUES (
+        2,
+        2,
+        4,
+        'Gutes Bier, aber etwas zu stark.',
+        '2024-08-07'
+    ),
+    (
+        2,
+        1,
+        3,
+        'Zu bitter für mich.',
+        '2024-08-10'
+    ),
+    (
+        2,
+        2,
+        2,
+        'Nicht mein Favorit.',
+        '2024-08-12'
+    );
+
+-- Bewertungen für Getränk 3 (Weißwein, süß) - Durchschnitt: 5.0
+INSERT INTO
+    Bewertung (
+        Getraenk_Id,
+        Benutzer_Id,
+        Bewertung,
+        Kommentar,
+        Datum
+    )
+VALUES (
+        3,
+        1,
+        5,
+        'Sehr süß und angenehm.',
+        '2024-07-20'
+    ),
+    (
+        3,
+        2,
+        5,
+        'Leckerer Wein, passt zu Dessert.',
+        '2024-07-22'
+    ),
+    (
+        3,
+        1,
+        5,
+        'Mein Lieblingswein!',
+        '2024-07-25'
+    );
+
+-- Bewertungen für Getränk 4 (Rotwein, sauer und fruchtig) - Durchschnitt: 4.33
+INSERT INTO
+    Bewertung (
+        Getraenk_Id,
+        Benutzer_Id,
+        Bewertung,
+        Kommentar,
+        Datum
+    )
+VALUES (
+        4,
+        2,
+        5,
+        'Fruchtig und sauer, sehr gut!',
+        '2024-04-10'
+    ),
+    (
+        4,
+        1,
+        4,
+        'Interessanter Geschmack, gefällt mir.',
+        '2024-04-12'
+    ),
+    (
+        4,
+        2,
+        4,
+        'Nicht schlecht, aber nicht mein Favorit.',
+        '2024-04-15'
+    );
+
+-- Bewertungen für Getränk 5 (Cider, fruchtig und süß) - Durchschnitt: 2.67
+INSERT INTO
+    Bewertung (
+        Getraenk_Id,
+        Benutzer_Id,
+        Bewertung,
+        Kommentar,
+        Datum
+    )
+VALUES (
+        5,
+        1,
+        3,
+        'Ganz ok, aber etwas zu mild.',
+        '2024-11-10'
+    ),
+    (
+        5,
+        2,
+        2,
+        'Zu süß für meinen Geschmack.',
+        '2024-11-12'
+    ),
+    (
+        5,
+        1,
+        3,
+        'Erfrischend, aber nicht besonders.',
+        '2024-11-15'
+    );
