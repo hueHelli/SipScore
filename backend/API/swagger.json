@@ -619,6 +619,57 @@
           "500": { "description": "Server error" }
         }
       }
+    },
+    "/rating/{id}": {
+      "put": {
+        "tags": ["Rating"],
+        "summary": "Update a rating",
+        "description": "Updates an existing rating. Only the owner (verified user or brewer) can update their own rating.",
+        "parameters": [
+          {
+            "name": "rid",
+            "in": "path",
+            "required": true,
+            "description": "ID of the rating",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+                  "comment": { "type": "string" }
+                },
+                "required": ["rating"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rating updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid rating value" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden (not owner or not allowed)" },
+          "404": { "description": "Rating not found" },
+          "500": { "description": "Server error" }
+        }
+      }
     }
   },
   "components": {
