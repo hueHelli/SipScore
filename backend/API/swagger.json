@@ -107,7 +107,13 @@
                   "username": { "type": "string" },
                   "password": { "type": "string" }
                 },
-                "required": ["firstName", "lastName", "email", "username", "password"]
+                "required": [
+                  "firstName",
+                  "lastName",
+                  "email",
+                  "username",
+                  "password"
+                ]
               }
             }
           }
@@ -268,7 +274,11 @@
             "name": "order",
             "in": "query",
             "description": "Sort order",
-            "schema": { "type": "string", "enum": ["ASC", "DESC"], "default": "ASC" }
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "ASC"
+            }
           }
         ],
         "responses": {
@@ -345,7 +355,8 @@
           "500": { "description": "Server error" }
         }
       }
-    },"/beverages/best": {
+    },
+    "/beverages/best": {
       "get": {
         "tags": ["Beverage"],
         "summary": "Get best beverages by type",
@@ -401,8 +412,76 @@
           "401": { "description": "Unauthorized" },
           "404": { "description": "Beverage not found" }
         }
+      },
+      "put": {
+        "tags": ["Beverage"],
+        "summary": "Update beverage",
+        "description": "Updates an existing beverage. Only users with role 'Brauer' (1) are allowed.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the beverage",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "Typ_Id": { "type": "integer" },
+                  "Startgravitation": { "type": "number" },
+                  "BeginnFermentation": { "type": "string", "format": "date" },
+                  "Abfuellung": { "type": "string", "format": "date" },
+                  "Alkoholgehalt": { "type": "number" },
+                  "Lager": { "type": "integer" },
+                  "Beschreibung": { "type": "string" },
+                  "Geschmack_Ids": {
+                    "type": "array",
+                    "items": { "type": "integer" },
+                    "description": "Array of Geschmack IDs"
+                  }
+                },
+                "required": [
+                  "Typ_Id",
+                  "Startgravitation",
+                  "BeginnFermentation",
+                  "Abfuellung",
+                  "Alkoholgehalt",
+                  "Lager",
+                  "Beschreibung",
+                  "Geschmack_Ids"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Beverage updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "id": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Beverage, type or flavor not found" },
+          "500": { "description": "Server error" }
+        }
       }
-    }, 
+    },
     "/beverages/{id}/rating": {
       "get": {
         "tags": ["Rating"],
@@ -438,7 +517,11 @@
             "name": "order",
             "in": "query",
             "description": "Sort order",
-            "schema": { "type": "string", "enum": ["ASC", "DESC"], "default": "DESC" }
+            "schema": {
+              "type": "string",
+              "enum": ["ASC", "DESC"],
+              "default": "DESC"
+            }
           }
         ],
         "responses": {
@@ -463,6 +546,39 @@
           },
           "401": { "description": "Unauthorized" },
           "404": { "description": "Beverage not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Beverage": {
+        "type": "object",
+        "properties": {
+          "Getraenk_Id": { "type": "integer" },
+          "Typ_Id": { "type": "integer" },
+          "Startgravitation": { "type": "number" },
+          "BeginnFermentation": { "type": "string", "format": "date" },
+          "Abfuellung": { "type": "string", "format": "date" },
+          "Alkoholgehalt": { "type": "number" },
+          "Lager": { "type": "integer" },
+          "Beschreibung": { "type": "string" },
+          "Geloescht": { "type": "boolean" },
+          "Typ": { "type": "string" },
+          "Geschmaecker": { "type": "string" }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "Benutzer_Id": { "type": "integer" },
+          "Vorname": { "type": "string" },
+          "Nachname": { "type": "string" },
+          "Email": { "type": "string" },
+          "Benutzername": { "type": "string" },
+          "Rolle": { "type": "string" },
+          "Verifiziert": { "type": "boolean" },
+          "Geloescht": { "type": "boolean" }
         }
       }
     }

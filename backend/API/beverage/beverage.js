@@ -222,4 +222,117 @@ beverage.post("/beverages", async (req, res) => {
   }
 });
 
+beverage.put("/beverages/:id", async (req, res) => {
+  const { id } = req.params;
+  const {
+    Typ_Id,
+    Startgravitation,
+    BeginnFermentation,
+    Abfuellung,
+    Alkoholgehalt,
+    Lager,
+    Beschreibung,
+    Geschmack_Ids, // Array of numbers
+  } = req.body;
+
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+
+    if (req.session.user.Rolle.data[0] !== 1) {
+      return res.status(403).json({ error: "I know who you are, but no" });
+    }
+
+    const [beverage] = await pool.query(
+      `
+      SELECT * FROM Getraenk
+      WHERE Getraenk_Id = ?
+      AND Geloescht = FALSE
+      `,
+      [id]
+    );
+
+    if (!beverage) {
+      return res.status(404).json({ error: "Beverage not found" });
+    }
+
+    const [type] = await pool.query(
+      `
+      SELECT * FROM Typ
+      WHERE Typ_Id = ?
+      AND Geloescht = FALSE
+      `,
+      [Typ_Id]
+    );
+
+    if (!type) {
+      return res.status(404).json({ error: "Type not found" });
+    }
+
+    const [result] = await pool.query(
+      `
+      UPDATE Getraenk
+      SET
+      Typ_Id = ?,
+      Startgravitation = ?,
+      BeginnFermentation = ?,
+      Abfuellung = ?,
+      Alkoholgehalt = ?,
+      Lager = ?,
+      Beschreibung = ?
+      WHERE Getraenk_Id = ?
+      `,
+      [
+        Typ_Id,
+        Startgravitation,
+        BeginnFermentation,
+        Abfuellung,
+        Alkoholgehalt,
+        Lager,
+        Beschreibung,
+        id,
+      ]
+    );
+
+    await pool.query(
+      `
+      DELETE FROM Getraenk_Geschmack
+      WHERE Getraenk_Id = ?
+      `,
+      [id]
+    );
+
+    for (const geschmack_Id of Geschmack_Ids) {
+      const [flavor] = await pool.query(
+        `
+        SELECT * FROM Geschmack
+        WHERE Geschmack_Id = ?
+        AND Geloescht = FALSE
+        `,
+        [geschmack_Id]
+      );
+
+      if (!flavor) {
+        return res.status(404).json({
+          error: `Flavor not found, seriously how tf did you do this, this should not be possible, like I am genuinely curious`,
+        });
+      } else {
+        await pool.query(
+          `
+          INSERT INTO Getraenk_Geschmack
+          (Getraenk_Id, Geschmack_Id)
+          VALUES
+          (?, ?)
+          `,
+          [result.insertId, geschmack_Id]
+        );
+      }
+    }
+    return res.status(200).json({ message: "Beverage updated", id: id });
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
 module.exports = beverage;
