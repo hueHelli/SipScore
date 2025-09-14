@@ -669,38 +669,60 @@
           "404": { "description": "Rating not found" },
           "500": { "description": "Server error" }
         }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Beverage": {
-        "type": "object",
-        "properties": {
-          "Getraenk_Id": { "type": "integer" },
-          "Typ_Id": { "type": "integer" },
-          "Startgravitation": { "type": "number" },
-          "BeginnFermentation": { "type": "string", "format": "date" },
-          "Abfuellung": { "type": "string", "format": "date" },
-          "Alkoholgehalt": { "type": "number" },
-          "Lager": { "type": "integer" },
-          "Beschreibung": { "type": "string" },
-          "Geloescht": { "type": "boolean" },
-          "Typ": { "type": "string" },
-          "Geschmaecker": { "type": "string" }
-        }
       },
-      "User": {
-        "type": "object",
-        "properties": {
-          "Benutzer_Id": { "type": "integer" },
-          "Vorname": { "type": "string" },
-          "Nachname": { "type": "string" },
-          "Email": { "type": "string" },
-          "Benutzername": { "type": "string" },
-          "Rolle": { "type": "string" },
-          "Verifiziert": { "type": "boolean" },
-          "Geloescht": { "type": "boolean" }
+      "delete": {
+        "tags": ["Rating"],
+        "summary": "Delete a rating",
+        "description": "Soft deletes a rating by its ID. Only the owner or an admin can delete a rating.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the rating",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Rating deleted" },
+          "400": { "description": "Invalid rating value" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden (not owner or not allowed)" },
+          "404": { "description": "Rating or beverage not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Beverage": {
+          "type": "object",
+          "properties": {
+            "Getraenk_Id": { "type": "integer" },
+            "Typ_Id": { "type": "integer" },
+            "Startgravitation": { "type": "number" },
+            "BeginnFermentation": { "type": "string", "format": "date" },
+            "Abfuellung": { "type": "string", "format": "date" },
+            "Alkoholgehalt": { "type": "number" },
+            "Lager": { "type": "integer" },
+            "Beschreibung": { "type": "string" },
+            "Geloescht": { "type": "boolean" },
+            "Typ": { "type": "string" },
+            "Geschmaecker": { "type": "string" }
+          }
+        },
+        "User": {
+          "type": "object",
+          "properties": {
+            "Benutzer_Id": { "type": "integer" },
+            "Vorname": { "type": "string" },
+            "Nachname": { "type": "string" },
+            "Email": { "type": "string" },
+            "Benutzername": { "type": "string" },
+            "Rolle": { "type": "string" },
+            "Verifiziert": { "type": "boolean" },
+            "Geloescht": { "type": "boolean" }
+          }
         }
       }
     }
