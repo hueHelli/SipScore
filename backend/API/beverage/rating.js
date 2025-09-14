@@ -34,4 +34,62 @@ rating.get("beverages/:id/rating", async (req, res) => {
   }
 });
 
+rating.post("/beverages/:id/rating", async (req, res) => {
+  const beverageId = req.params.id;
+  const { rating, comment } = req.body;
+
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+
+    if (
+      req.session.user.Rolle.data[0] !== 1 &&
+      req.session.user.Rolle.data[0] !== 2
+    ) {
+      return res.status(403).json({ error: "I know who you are, but no" });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res
+        .status(400)
+        .json({ error: "You fucked up: Rating must be between 1 and 5" });
+    }
+
+    const [beverage] = await pool.query(
+      `
+      SELECT * FROM Getraenk
+      WHERE Getraenk_Id = ?
+      AND Geloescht = FALSE
+      `,
+      [beverageId]
+    );
+
+    if (!beverage) {
+      return res.status(404).json({ error: "Beverage not found" });
+    }
+
+    const [result] = await pool.query(
+      `
+      INSERT INTO Bewertung
+      (Getreank_Id, Benutzer_Id, Bewwertung, Kommentar, Datum)
+      VALUES
+      (?, ?, ?, ?, NOW())
+      `,
+      [
+        beverageId,
+        req.session.user.Benutzer_Id,
+        rating,
+        comment ? comment : null,
+      ]
+    );
+
+    return res
+      .status(201)
+      .json({ message: "Rating created", id: result.insertId });
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
 module.exports = rating;

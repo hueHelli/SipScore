@@ -568,6 +568,56 @@
           "401": { "description": "Unauthorized" },
           "404": { "description": "Beverage not found" }
         }
+      },
+      "post": {
+        "tags": ["Rating"],
+        "summary": "Create a rating for a beverage",
+        "description": "Creates a new rating for a beverage. Only verified users and brewers (role 1 or 2) are allowed.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the beverage",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": { "type": "integer", "minimum": 1, "maximum": 5 },
+                  "comment": { "type": "string" }
+                },
+                "required": ["rating"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Rating created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "id": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Invalid rating value" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Beverage not found" },
+          "500": { "description": "Server error" }
+        }
       }
     }
   },
