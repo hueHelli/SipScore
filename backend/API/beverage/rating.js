@@ -92,4 +92,115 @@ rating.post("/beverages/:id/rating", async (req, res) => {
   }
 });
 
+rating.put("/rating/:id", async (req, res) => {
+  const ratingId = req.params.id;
+  const { rating, comment } = req.body;
+
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+
+    if (
+      req.session.user.Rolle.data[0] !== 1 &&
+      req.session.user.Rolle.data[0] !== 2
+    ) {
+      return res.status(403).json({ error: "I know who you are, but no" });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res
+        .status(400)
+        .json({ error: "You fucked up: Rating must be between 1 and 5" });
+    }
+
+    const [rating] = await pool.query(
+      `
+      SELECT * FROM Bewertung
+      WHERE Bewertung_Id = ?
+      AND Geloescht = FALSE
+      `,
+      [ratingId]
+    );
+
+    if (!rating) {
+      return res.status(404).json({ error: "Rating not found" });
+    }
+
+    if (rating.Benutzer_Id !== req.session.user.Benutzer_Id) {
+      return res.status(403).json({
+        error: "I know who you are but no (You can only edit your own ratings)",
+      });
+    }
+
+    await pool.query(
+      `
+      UPDATE Bewertung
+      SET Bewertung = ?, Kommentar = ?
+      WHERE Bewertung_Id = ?
+      `,
+      [rating, comment ? comment : null, ratingId]
+    );
+
+    return res.status(200).json({ message: `Rating updated: ${ratingId}` });
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
+rating.delete("/rating/:id", async (req, res) => {
+  const ratingId = req.params.id;
+  try {
+    if (!req.session.user || req.session.user.Geloescht) {
+      return res.status(401).json({ error: "I don't know who you are" });
+    }
+
+    if (req.session.user.Rolle.data[0] > 2) {
+      return res.status(403).json({ error: "I know who you are, but no" });
+    }
+
+    if (rating < 1 || rating > 5) {
+      return res
+        .status(400)
+        .json({ error: "You fucked up: Rating must be between 1 and 5" });
+    }
+
+    const [beverage] = await pool.query(
+      `
+      SELECT * FROM Getraenk
+      WHERE Getraenk_Id = ?
+      AND Geloescht = FALSE
+      `,
+      [beverageId]
+    );
+
+    if (!beverage) {
+      return res.status(404).json({ error: "Beverage not found" });
+    }
+
+    if (
+      rating.Benutzer_Id !== req.session.user.Benutzer_Id &&
+      req.session.user.Rolle.data[0] !== 0
+    ) {
+      return res.status(403).json({
+        error:
+          "I know who you are but no (You can only delete your own ratings)",
+      });
+    }
+
+    await pool.query(
+      `
+      UPDATE Bewertung
+      SET Geloescht = TRUE
+      WHERE Bewertung_Id = ?
+      `,
+      [ratingId]
+    );
+
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
+  }
+});
+
 module.exports = rating;
