@@ -20,6 +20,7 @@ beverage.get("/beverages", async (req, res) => {
 
   let whereClauses = [];
   let params = [];
+  let badParams = "";
 
   // Typ Filter
   if (Typ_Id) {
@@ -46,6 +47,23 @@ beverage.get("/beverages", async (req, res) => {
   }
 
   // Alter Filter (Monate)
+
+  if (
+    !Number(Min_Alter) ||
+    Number(Min_Alter) % 1 !== 0 ||
+    Number(Min_Alter) < 0
+  ) {
+    badParams += "Min_Alter must be a non negative Integer. ";
+  } else if (
+    !Number(Max_Alter) ||
+    Number(Max_Alter) % 1 !== 0 ||
+    Number(Min_Alter) < 0
+  ) {
+    badParams += "Max_Alter must be a non negative Integer. ";
+  } else if (Number(Min_Alter) > Number(Max_Alter)) {
+    badParams += "Min_Alter must be less than or equal to Max_Alter. ";
+  }
+
   if (Min_Alter != null) {
     whereClauses.push(`TIMESTAMPDIFF(MONTH, g.Abfuellung, CURDATE()) >= ?`);
     params.push(Number(Min_Alter));
@@ -56,6 +74,22 @@ beverage.get("/beverages", async (req, res) => {
   }
 
   // Alkohol Filter
+  if (
+    !Number(Min_Alkohol) ||
+    Number(Min_Alkohol) % 1 !== 0 ||
+    Number(Min_Alkohol) < 0
+  ) {
+    badParams += "Min_Alkohol must be a non negative Integer. ";
+  } else if (
+    !Number(Max_Alkohol) ||
+    Number(Max_Alkohol) % 1 !== 0 ||
+    Number(Max_Alkohol) < 0
+  ) {
+    badParams += "Max_Alkohol must be a non negative Integer. ";
+  } else if (Number(Min_Alter) > Number(Max_Alter)) {
+    badParams += "Min_Alkohol must be less than or equal to Max_Alkohol. ";
+  }
+
   if (Min_Alkohol != null) {
     whereClauses.push(`g.Alkoholgehalt >= ?`);
     params.push(Number(Min_Alkohol));
@@ -66,8 +100,15 @@ beverage.get("/beverages", async (req, res) => {
   }
 
   // Lager Filter
+  if (Auf_Lager != null && Auf_Lager !== "true" && Auf_Lager !== "false") {
+    badParams += "Auf_Lager must be true or false. ";
+  }
   if (Auf_Lager != null) {
     whereClauses.push(`g.Lager ${Auf_Lager === "true" ? ">" : "="} 0`);
+  }
+
+  if (badParams) {
+    return res.status(400).json({ error: badParams });
   }
 
   // Nicht gelöschte Getränke
@@ -98,6 +139,11 @@ beverage.get("/beverages", async (req, res) => {
       return res.status(401).json({ error: "I don't know who you are" });
     }
     const [rows] = await pool.query(sql, params);
+
+    if (!rows) {
+      return res.status(404).json({ error: "No beverages found" });
+    }
+
     return res.status(200).json(rows);
   } catch (error) {
     return res.status(500).json({ error: `We fucked up: ${error.message}` });
