@@ -1,4 +1,4 @@
--- Active: 1755588480904@@localhost@3306@sipscore
+-- Active: 1757502370623@@localhost@3306@sipscore
 DROP DATABASE IF EXISTS sipscore;
 
 CREATE DATABASE sipscore;
