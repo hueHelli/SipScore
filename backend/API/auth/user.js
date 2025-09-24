@@ -1,5 +1,5 @@
 const express = require("express");
-const signup = express.Router();
+const user = express.Router();
 const bcrypt = require("bcrypt");
 const pool = require("../pool");
 const nodemailer = require("nodemailer");
@@ -13,7 +13,49 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-signup.post("/user", async (req, res) => {
+user.get("/users", async (req, res) => {
+  try {
+    const [users] = await pool.query(
+      `
+      SELECT Benutzer_Id, Vorname, Nachname, Email, Benutzername, Rolle
+      FROM Benutzer
+      WHERE Verifiziert = TRUE
+      AND Geloescht = FALSE
+      `
+    );
+
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up:  ${error.message}` });
+  }
+});
+
+user.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const [users] = await pool.query(
+      `
+      SELECTBenutzer_Id, Vorname, Nachname, Email, Benutzername, Rolle
+      FROM Benutzer
+      WHERE Benutzer_Id = ?
+      AND Verifiziert = TRUE
+      AND Geloescht = FALSE
+      `,
+      [id]
+    );
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    return res.status(200).json(users[0]);
+  } catch (error) {
+    return res.status(500).json({ error: `We fucked up:  ${error.message}` });
+  }
+});
+
+user.post("/users", async (req, res) => {
   const { firstName, lastName, email, username, password } = req.body;
 
   const passwordHash = bcrypt.hashSync(password, 10);
@@ -81,50 +123,53 @@ signup.post("/user", async (req, res) => {
       text: `Dein Code lautet: ${code}`,
     });
 
-    res.status(201).json({ message: "User created temporarily", verification });
+    return res
+      .status(201)
+      .json({ message: `User created temporarily: ${verification.insertId}` });
   } catch (error) {
-    console.error("Error inserting user:", error);
-    res.status(500).json({ error: `We fucked up:  ${error.message}` });
+    return res.status(500).json({ error: `We fucked up:  ${error.message}` });
   }
 });
 
-signup.put("/user", async (req, res) => {
-  const { email, code } = req.body;
+user.put("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { request, action = "update" } = req.body;
 
   try {
-    const [user] = await pool.query(
-      `
+    if (action === "verifyEmail") {
+      const [user] = await pool.query(
+        `
         SELECT * FROM Benutzer
-        WHERE Email = ?
-        AND Code = ?
-        AND Verifiziert = FALSE
-        AND Geloescht = FALSE
+        WHERE Benutzer_Id = ?
       `,
-      [email, code]
-    );
+        [id]
+      );
 
-    if (user.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "You fucked up: Invalid Code or Email" });
-    }
+      if (user.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
 
-    await pool.query(
-      `
+      if (Number(user[0].Code) !== Number(request.code)) {
+        return res.status(400).json({ error: "Invalid verification code" });
+      }
+
+      await pool.query(
+        `
         UPDATE Benutzer
         SET Verifiziert = TRUE, Code = NULL
-        WHERE Email = ?
+        WHERE Benutzer_Id = ?
       `,
-      [email]
-    );
+        [id]
+      );
 
-    res.status(200).json({ message: "Email verified successfully" });
+      return res.status(200).json({ message: "Email verified successfully" });
+    }
   } catch (error) {
-    res.status(500).json({ error: `We fucked up: ${error.message}` });
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
 });
 
-signup.delete("/user/:id", async (req, res) => {
+user.delete("/users/:id", async (req, res) => {
   const userId = req.params.id;
 
   try {
@@ -137,10 +182,10 @@ signup.delete("/user/:id", async (req, res) => {
       [userId]
     );
 
-    resume.status(204).send();
+    return res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: `We fucked up: ${error.message}` });
+    return res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
 });
 
-module.exports = signup;
+module.exports = user;

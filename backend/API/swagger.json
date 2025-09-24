@@ -19,7 +19,28 @@
     { "name": "Rating", "description": "Beverage ratings" }
   ],
   "paths": {
-    "/session": {
+    "/sessions": {
+      "get": {
+        "tags": ["Session"],
+        "summary": "Get session user",
+        "description": "Returns the current session user.",
+        "responses": {
+          "200": {
+            "description": "Session active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "No session active" }
+        }
+      },
       "post": {
         "tags": ["Session"],
         "summary": "Login",
@@ -58,27 +79,6 @@
           "403": { "description": "Email not verified" }
         }
       },
-      "get": {
-        "tags": ["Session"],
-        "summary": "Get session user",
-        "description": "Returns the current session user.",
-        "responses": {
-          "200": {
-            "description": "Session active",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "user": { "$ref": "#/components/schemas/User" }
-                  }
-                }
-              }
-            }
-          },
-          "401": { "description": "No session active" }
-        }
-      },
       "delete": {
         "tags": ["Session"],
         "summary": "Logout",
@@ -89,7 +89,26 @@
         }
       }
     },
-    "/user": {
+    "/users": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get all users",
+        "description": "Returns all verified, non-deleted users.",
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/User" }
+                }
+              }
+            }
+          },
+          "500": { "description": "Server error" }
+        }
+      },
       "post": {
         "tags": ["User"],
         "summary": "Signup",
@@ -123,11 +142,38 @@
           "400": { "description": "Invalid email format" },
           "409": { "description": "Email or username already in use" }
         }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get user by ID",
+        "description": "Returns a single verified, non-deleted user by ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "description": "User not found" },
+          "500": { "description": "Server error" }
+        }
       },
       "put": {
         "tags": ["User"],
-        "summary": "Verify user email",
-        "description": "Verify user email with code.",
+        "summary": "Update User / Verify Email",
+        "description": "Update user details or verify email with code.",
         "requestBody": {
           "required": true,
           "content": {
@@ -135,21 +181,19 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "email": { "type": "string" },
-                  "code": { "type": "string" }
+                  "request": { "type": "object" },
+                  "action": { "type": "string" }
                 },
-                "required": ["email", "code"]
+                "required": ["id", "code"]
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Email verified" },
-          "400": { "description": "Invalid code or email" }
+          "200": { "description": "User updated / Email verified" },
+          "400": { "description": "You fucked up: {error}" }
         }
-      }
-    },
-    "/user/{id}": {
+      },
       "delete": {
         "tags": ["User"],
         "summary": "Delete user",
@@ -168,7 +212,7 @@
         }
       }
     },
-    "/role/{id}": {
+    "/roles/{id}": {
       "put": {
         "tags": ["Role"],
         "summary": "Promote user role",
@@ -293,7 +337,8 @@
               }
             }
           },
-          "401": { "description": "Unauthorized" }
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "No beverages found" }
         }
       },
       "post": {
@@ -501,7 +546,9 @@
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden" },
-          "404": { "description": "Beverage, type, flavor or ingredient not found" },
+          "404": {
+            "description": "Beverage, type, flavor or ingredient not found"
+          },
           "500": { "description": "Server error" }
         }
       },
@@ -527,7 +574,7 @@
         }
       }
     },
-    "/beverages/{id}/rating": {
+    "/beverages/{id}/ratings": {
       "get": {
         "tags": ["Rating"],
         "summary": "Get ratings for a beverage",
@@ -644,7 +691,7 @@
         }
       }
     },
-    "/rating/{id}": {
+    "/ratings/{id}": {
       "put": {
         "tags": ["Rating"],
         "summary": "Update a rating",

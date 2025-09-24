@@ -1,8 +1,8 @@
 const express = require("express");
-const promote = express.Router();
+const role = express.Router();
 const pool = require("../pool");
 
-promote.put("/role/:id", async (req, res) => {
+role.put("/roles/:id", async (req, res) => {
   const userId = req.params.id;
   const { newRole } = req.body;
   const currentUser = req.session.user;
@@ -56,4 +56,4 @@ promote.put("/role/:id", async (req, res) => {
   }
 });
 
-module.exports = promote;
+module.exports = role;

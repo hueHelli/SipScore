@@ -3,11 +3,11 @@ const app = express();
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
-const login = require("./auth/login");
-const signup = require("./auth/signup");
-const promote = require("./auth/promote");
+const login = require("./auth/session");
+const signup = require("./auth/user");
+const promote = require("./auth/role");
 const beverage = require("./beverage/beverage");
-const best = require("./beverage/bestBeverages");
+const best = require("./beverage/best");
 const rating = require("./beverage/rating");
 const bcrypt = require("bcrypt");
 
