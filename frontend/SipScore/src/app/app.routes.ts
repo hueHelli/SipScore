@@ -7,6 +7,7 @@ import { Login } from './components/auth/login/login';
 import { Signup } from './components/auth/signup/signup';
 import { Verify } from './components/auth/verify/verify';
 import { AuthGuard } from './guards/auth.guard';
+import { Beverages } from './components/beverages/beverages';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -14,6 +15,7 @@ export const routes: Routes = [
   { path: 'signup', component: Signup },
   { path: 'verify/:id', component: Verify },
   { path: 'home', component: Home, canActivate: [AuthGuard] },
+  { path: 'beverages', component: Beverages, canActivate: [AuthGuard] },
   { path: 'new-rating', component: NewRating, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/home', pathMatch: 'full' },
 ];
