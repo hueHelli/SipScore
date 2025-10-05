@@ -53,6 +53,13 @@ export class Login {
   }
 
   ngOnInit(): void {
+    this.httpService.getSession().subscribe((res: any) => {
+      if (res.user) {
+        this.userService.setUser(res.user);
+        this.router.navigate(['/home']);
+      }
+    });
+
     this.loginForm = new FormGroup({
       credential: new FormControl('', []),
       password: new FormControl('', []),

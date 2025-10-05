@@ -40,4 +40,8 @@ export class HttpService {
       { withCredentials: true }
     );
   }
+
+  getSession() {
+    return this.http.get(this.apiSession, { withCredentials: true });
+  }
 }

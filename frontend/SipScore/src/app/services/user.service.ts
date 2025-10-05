@@ -9,7 +9,7 @@ export class UserService {
     lastName: '',
     email: '',
     username: '',
-    role: '',
+    role: null,
   };
   setUser(user: {
     Benutzer_Id: number;
@@ -27,6 +27,9 @@ export class UserService {
     this.user.email = user.Email;
     this.user.username = user.Benutzername;
     this.user.role = user.Rolle.data;
-    console.log(this.user);
+  }
+
+  getUserRole() {
+    return this.user.role;
   }
 }
