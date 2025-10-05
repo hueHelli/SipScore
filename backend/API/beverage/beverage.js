@@ -140,7 +140,7 @@ beverage.get("/beverages", async (req, res) => {
     }
     const [rows] = await pool.query(sql, params);
 
-    if (!rows) {
+    if (!rows || rows.length === 0) {
       return res.status(404).json({ error: "No beverages found" });
     }
 
@@ -171,7 +171,7 @@ beverage.get("/beverages/:id", async (req, res) => {
       [id]
     );
 
-    if (!rows) {
+    if (!rows || rows.length === 0) {
       return res.status(404).json({ error: "Beverage not found" });
     }
 
@@ -212,7 +212,7 @@ beverage.post("/beverages", async (req, res) => {
       [Typ_Id]
     );
 
-    if (!type) {
+    if (!type || type.length === 0) {
       return res.status(404).json({ error: "Type not found" });
     }
 
@@ -244,7 +244,7 @@ beverage.post("/beverages", async (req, res) => {
         [geschmack_Id]
       );
 
-      if (!flavor) {
+      if (!flavor || flavor.length === 0) {
         await pool.query(
           `
           DELETE FROM Getraenk 
@@ -281,7 +281,7 @@ beverage.post("/beverages", async (req, res) => {
         [Zutat_Id]
       );
 
-      if (!ingredient) {
+      if (!ingredient || ingredient.length === 0) {
         await pool.query(
           `
           DELETE FROM Getraenk
@@ -344,7 +344,7 @@ beverage.put("/beverages/:id", async (req, res) => {
       [id]
     );
 
-    if (!beverage) {
+    if (!beverage || beverage.length === 0) {
       return res.status(404).json({ error: "Beverage not found" });
     }
 
@@ -357,7 +357,7 @@ beverage.put("/beverages/:id", async (req, res) => {
       [Typ_Id]
     );
 
-    if (!type) {
+    if (!type || type.length === 0) {
       return res.status(404).json({ error: "Type not found" });
     }
 
@@ -404,7 +404,7 @@ beverage.put("/beverages/:id", async (req, res) => {
         [geschmack_Id]
       );
 
-      if (!flavor) {
+      if (!flavor || flavor.length === 0) {
         return res.status(404).json({
           error: `Flavor not found, seriously how tf did you do this, this should not be possible, like I am genuinely curious`,
         });
@@ -439,7 +439,7 @@ beverage.put("/beverages/:id", async (req, res) => {
         [Zutat_Id]
       );
 
-      if (!ingredient) {
+      if (!ingredient || ingredient.length === 0) {
         return res.status(404).json({ error: "Ingredient not found" });
       } else {
         await pool.query(
@@ -481,7 +481,7 @@ beverage.delete("/beverages/:id", async (req, res) => {
       [id]
     );
 
-    if (!beverage) {
+    if (!beverage || beverage.length === 0) {
       return res.status(404).json({ error: "Beverage not found" });
     }
 

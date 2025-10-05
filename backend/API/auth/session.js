@@ -6,7 +6,7 @@ const cookie = require("../session");
 
 login.use(cookie);
 
-login.post("/session", async (req, res) => {
+login.post("/sessions", async (req, res) => {
   const { credential, password } = req.body;
 
   let email = null;
@@ -40,7 +40,7 @@ login.post("/session", async (req, res) => {
       );
     }
 
-    if (!user) {
+    if (!user || user.length === 0) {
       return res
         .status(401)
         .json({ error: "Invalid email, username or password" });
@@ -61,7 +61,7 @@ login.post("/session", async (req, res) => {
   }
 });
 
-login.get("/session", async (req, res) => {
+login.get("/sessions", async (req, res) => {
   if (req.session.user && !req.session.user.Geloescht) {
     res.status(200).json({ user: req.session.user });
   } else {
@@ -69,7 +69,7 @@ login.get("/session", async (req, res) => {
   }
 });
 
-login.delete("/session", async (req, res) => {
+login.delete("/sessions", async (req, res) => {
   req.session.destroy((error) => {
     if (error) {
       console.error("Error occurred during logout:", err);

@@ -2,7 +2,7 @@ const express = require("express");
 const rating = express.Router();
 const pool = require("../pool");
 
-rating.get("beverages/:id/rating", async (req, res) => {
+rating.get("beverages/:id/ratings", async (req, res) => {
   const id = req.params.id;
   const { page = 1, pageSize = 20, sort = "Datum", order = "DESC" } = req.query;
 
@@ -34,7 +34,7 @@ rating.get("beverages/:id/rating", async (req, res) => {
   }
 });
 
-rating.post("/beverages/:id/rating", async (req, res) => {
+rating.post("/beverages/:id/ratings", async (req, res) => {
   const beverageId = req.params.id;
   const { rating, comment } = req.body;
 
@@ -65,7 +65,7 @@ rating.post("/beverages/:id/rating", async (req, res) => {
       [beverageId]
     );
 
-    if (!beverage) {
+    if (!beverage || beverage.length === 0) {
       return res.status(404).json({ error: "Beverage not found" });
     }
 
@@ -123,7 +123,7 @@ rating.put("/rating/:id", async (req, res) => {
       [ratingId]
     );
 
-    if (!rating) {
+    if (!rating || rating.length === 0) {
       return res.status(404).json({ error: "Rating not found" });
     }
 
@@ -174,7 +174,7 @@ rating.delete("/rating/:id", async (req, res) => {
       [beverageId]
     );
 
-    if (!beverage) {
+    if (!beverage || beverage.length === 0) {
       return res.status(404).json({ error: "Beverage not found" });
     }
 
