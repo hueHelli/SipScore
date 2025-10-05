@@ -318,6 +318,18 @@
                     "type": "array",
                     "items": { "type": "integer" },
                     "description": "Array of Geschmack IDs"
+                  },
+                  "Rezept": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Zutat_Id": { "type": "integer" },
+                        "Menge": { "type": "string" }
+                      },
+                      "required": ["Zutat_Id", "Menge"]
+                    },
+                    "description": "Array of ingredients with Zutat_Id and Menge"
                   }
                 },
                 "required": [
@@ -351,7 +363,7 @@
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden" },
-          "404": { "description": "Type or flavor not found" },
+          "404": { "description": "Type, flavor or ingredient not found" },
           "500": { "description": "Server error" }
         }
       }
@@ -444,6 +456,18 @@
                     "type": "array",
                     "items": { "type": "integer" },
                     "description": "Array of Geschmack IDs"
+                  },
+                  "Rezept": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "Zutat_Id": { "type": "integer" },
+                        "Menge": { "type": "string" }
+                      },
+                      "required": ["Zutat_Id", "Menge"]
+                    },
+                    "description": "Array of ingredients with Zutat_Id and Menge"
                   }
                 },
                 "required": [
@@ -477,7 +501,7 @@
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden" },
-          "404": { "description": "Beverage, type or flavor not found" },
+          "404": { "description": "Beverage, type, flavor or ingredient not found" },
           "500": { "description": "Server error" }
         }
       },
