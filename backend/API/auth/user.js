@@ -128,7 +128,7 @@ user.post("/users", async (req, res) => {
 
     return res
       .status(201)
-      .json({ message: `User created temporarily: ${verification.insertId}` });
+      .json({ message: `User created temporarily`, id: verification.insertId });
   } catch (error) {
     return res.status(500).json({ error: `We fucked up:  ${error.message}` });
   }
