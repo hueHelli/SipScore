@@ -18,4 +18,8 @@ type.get("/types", async (req, res) => {
   }
 });
 
+/*type.get("/types/:id", async (req, res) => {
+
+})*/
+
 module.exports = type;

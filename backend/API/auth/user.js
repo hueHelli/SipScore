@@ -163,6 +163,33 @@ user.put("/users/:id", async (req, res) => {
       );
 
       return res.status(200).json({ message: "Email verified successfully" });
+    } else if (action === "update") {
+      const { firstName, lastName, email, username } = request;
+
+      const [existingUser] = await pool.query(
+        `
+        SELECT * FROM Benutzer
+        WHERE Benutzer_Id = ?
+        `,
+        [id]
+      );
+
+      if (!existingUser || existingUser.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      await pool.query(
+        `
+        UPDATE Benutzer
+        SET Vorname = ?, Nachname = ?, Email = ?, Benutzername = ?
+        WHERE Benutzer_Id = ?
+      `,
+        [firstName, lastName, email, username, id]
+      );
+
+      return res.status(200).json({ message: "User updated" });
+    } else if (action === "password") {
+      
     }
   } catch (error) {
     return res.status(500).json({ error: `We fucked up: ${error.message}` });

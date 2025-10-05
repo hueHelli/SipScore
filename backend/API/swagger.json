@@ -172,8 +172,8 @@
       },
       "put": {
         "tags": ["User"],
-        "summary": "Update User / Verify Email",
-        "description": "Update user details or verify email with code.",
+        "summary": "Update User / Verify Email / Change Password",
+        "description": "Update user details, verify email with code, or change password.",
         "requestBody": {
           "required": true,
           "content": {
@@ -184,13 +184,15 @@
                   "request": { "type": "object" },
                   "action": { "type": "string" }
                 },
-                "required": ["id", "code"]
+                "required": ["request", "action"]
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "User updated / Email verified" },
+          "200": {
+            "description": "User updated / Email verified / Password Changed"
+          },
           "400": { "description": "You fucked up: {error}" }
         }
       },
