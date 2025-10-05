@@ -167,7 +167,12 @@ user.put("/users/:id", async (req, res) => {
       );
 
       req.session.user = user[0];
-      return res.status(200).json({ message: "Email verified successfully" });
+      return res
+        .status(200)
+        .json({
+          message: "Email verified successfully",
+          user: req.session.user,
+        });
     } else if (action === "update") {
       const { firstName, lastName, email, username } = request;
 
