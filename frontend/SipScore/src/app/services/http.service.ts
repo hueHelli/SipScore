@@ -24,4 +24,11 @@ export class HttpService {
       password,
     });
   }
+
+  verifyMail(insertId: number, code: number) {
+    return this.http.put(this.apiUser + '/' + insertId, {
+      request: { code: code },
+      action: 'verify',
+    });
+  }
 }
