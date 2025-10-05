@@ -25,8 +25,10 @@ export class Signup {
 
   signupForm!: FormGroup;
   errorMsg: string | null = null;
+  loading: boolean = false;
 
   onSubmit() {
+    this.loading = true;
     if (this.signupForm.invalid) {
       this.errorMsg = 'Ungültige Angabe';
       this.cdr.detectChanges();
@@ -69,6 +71,7 @@ export class Signup {
   }
 
   ngOnInit(): void {
+    this.loading = false;
     this.signupForm = new FormGroup({
       firstName: new FormControl('', [Validators.required]),
       lastName: new FormControl('', [Validators.required]),

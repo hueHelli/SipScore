@@ -1,1 +1,5 @@
-<p>best-beverages works!</p>
+<div class="beverages" *ngIf="!loading">
+  <div *ngFor="let beverage of bestBeverages">
+    <app-beverageCard [beverage]="beverage"></app-beverageCard>
+  </div>
+</div>

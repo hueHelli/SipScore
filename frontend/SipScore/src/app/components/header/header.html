@@ -1,3 +1,9 @@
 <div class="nav-main">
-  <h2>Sip Score</h2>
+  <div class="nav-start">
+    <h2>Sip Score</h2>
+  </div>
+  <div class="nav-end" *ngIf="userName">
+    <p class="text-primary">{{ userName }}</p>
+    <button class="secondary" (click)="logout()">Abmelden</button>
+  </div>
 </div>

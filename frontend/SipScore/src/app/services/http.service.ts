@@ -9,6 +9,7 @@ export class HttpService {
   apiUrl = 'http://localhost:3000/api/';
   apiUser = this.apiUrl + 'users';
   apiSession = this.apiUrl + 'sessions';
+  apiBeverage = this.apiUrl + 'beverages';
 
   postUser(
     firstName: string,
@@ -41,7 +42,15 @@ export class HttpService {
     );
   }
 
+  logout() {
+    return this.http.delete(this.apiSession, { withCredentials: true });
+  }
+
   getSession() {
     return this.http.get(this.apiSession, { withCredentials: true });
+  }
+
+  getBestBeverages() {
+    return this.http.get(this.apiBeverage + '/best', { withCredentials: true });
   }
 }

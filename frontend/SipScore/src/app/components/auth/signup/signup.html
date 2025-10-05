@@ -40,7 +40,9 @@
         formControlName="confirmPassword"
       />
       <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
-      <button type="submit" (click)="onSubmit()">Account erstellen</button>
+      <button type="submit" (click)="onSubmit()" [disabled]="loading">
+        Account erstellen
+      </button>
     </form>
     <button class="btn secondary" (click)="goToLogin()">Anmelden</button>
   </div>

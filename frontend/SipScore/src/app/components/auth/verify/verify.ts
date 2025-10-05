@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -21,7 +21,8 @@ export class Verify {
   constructor(
     private router: Router,
     private httpService: HttpService,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   verfyForm!: FormGroup;
@@ -39,13 +40,16 @@ export class Verify {
         )
         .subscribe(
           (res: any) => {
-            // TODO sending user but have to wait until backend is fixed
-            console.log(res);
-            this.userService.setUser(res.user);
-            this.router.navigate(['/home']);
+            this.httpService.getSession().subscribe((res: any) => {
+              if (res.user) {
+                this.userService.setUser(res.user);
+                this.router.navigate(['/home']);
+              }
+            });
           },
           (err) => {
             this.errorMsg = 'Falscher Code';
+            this.cdr.detectChanges();
           }
         );
     }
