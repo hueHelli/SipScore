@@ -44,7 +44,7 @@ flavor.post("/flavors", async (req, res) => {
     );
     return res
       .status(201)
-      .json({ message: "Flavor added", flavorId: result.insertId });
+      .json({ message: "Flavor added", id: result.insertId });
   } catch (error) {
     return res.status(500).json({ error: `We fucked up: ${error.message}` });
   }

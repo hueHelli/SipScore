@@ -31,7 +31,9 @@ ingredient.post("/ingredients", async (req, res) => {
   const { ingredient } = req.body;
 
   if (!ingredient) {
-    return res.status(400).json({ error: "Missing ingredient in request body" });
+    return res
+      .status(400)
+      .json({ error: "Missing ingredient in request body" });
   }
 
   try {
@@ -44,7 +46,7 @@ ingredient.post("/ingredients", async (req, res) => {
     );
     return res
       .status(201)
-      .json({ message: "Ingredient added", ingredientId: result.insertId });
+      .json({ message: "Ingredient added", id: result.insertId });
   } catch (error) {
     return res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
