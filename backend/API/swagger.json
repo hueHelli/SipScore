@@ -16,7 +16,9 @@
     { "name": "User", "description": "User registration and management" },
     { "name": "Role", "description": "User role management" },
     { "name": "Beverage", "description": "Beverage queries" },
-    { "name": "Rating", "description": "Beverage ratings" }
+    { "name": "Rating", "description": "Beverage ratings" },
+    { "name": "Flavor", "description": "Beverage flavors" },
+    { "name": "Ingredient", "description": "Beverage ingredients" }
   ],
   "paths": {
     "/sessions": {
@@ -182,7 +184,7 @@
                 "type": "object",
                 "properties": {
                   "request": { "type": "object" },
-                  "action": { "type": "string" }
+                  "action": { "type": "verify || update || password" }
                 },
                 "required": ["request", "action"]
               }
@@ -193,7 +195,10 @@
           "200": {
             "description": "User updated / Email verified / Password Changed"
           },
-          "400": { "description": "You fucked up: {error}" }
+          "400": { "description": "You fucked up: {error}" },
+          "403": { "description": "Wrong Password" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Server error" }
         }
       },
       "delete": {
@@ -766,36 +771,281 @@
         }
       }
     },
-    "components": {
-      "schemas": {
-        "Beverage": {
-          "type": "object",
-          "properties": {
-            "Getraenk_Id": { "type": "integer" },
-            "Typ_Id": { "type": "integer" },
-            "Startgravitation": { "type": "number" },
-            "BeginnFermentation": { "type": "string", "format": "date" },
-            "Abfuellung": { "type": "string", "format": "date" },
-            "Alkoholgehalt": { "type": "number" },
-            "Lager": { "type": "integer" },
-            "Beschreibung": { "type": "string" },
-            "Geloescht": { "type": "boolean" },
-            "Typ": { "type": "string" },
-            "Geschmaecker": { "type": "string" }
+    "/flavors": {
+      "get": {
+        "tags": ["Flavor"],
+        "summary": "Get all flavors",
+        "description": "Returns all non-deleted flavors (Geschmack).",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "schema": { "type": "integer", "default": 50 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of flavors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Geschmack_Id": { "type": "integer" },
+                      "Bezeichnung": { "type": "string" },
+                      "Geloescht": { "type": "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "No flavors found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "post": {
+        "tags": ["Flavor"],
+        "summary": "Create a new flavor",
+        "description": "Creates a new flavor (Geschmack).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "flavor": { "type": "string" }
+                },
+                "required": ["flavor"]
+              }
+            }
           }
         },
-        "User": {
-          "type": "object",
-          "properties": {
-            "Benutzer_Id": { "type": "integer" },
-            "Vorname": { "type": "string" },
-            "Nachname": { "type": "string" },
-            "Email": { "type": "string" },
-            "Benutzername": { "type": "string" },
-            "Rolle": { "type": "string" },
-            "Verifiziert": { "type": "boolean" },
-            "Geloescht": { "type": "boolean" }
+        "responses": {
+          "201": {
+            "description": "Flavor added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "flavorId": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing flavor in request body" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/flavors/{id}": {
+      "delete": {
+        "tags": ["Flavor"],
+        "summary": "Delete a flavor",
+        "description": "Soft deletes a flavor (Geschmack) by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the flavor",
+            "schema": { "type": "integer" }
           }
+        ],
+        "responses": {
+          "204": { "description": "Flavor deleted" },
+          "404": { "description": "Flavor not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/ingredients": {
+      "get": {
+        "tags": ["Ingredient"],
+        "summary": "Get all ingredients",
+        "description": "Returns all non-deleted ingredients (Zutat).",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Page size",
+            "schema": { "type": "integer", "default": 50 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of ingredients",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Zutat_Id": { "type": "integer" },
+                      "Bezeichnung": { "type": "string" },
+                      "Geloescht": { "type": "boolean" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "No ingredients found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "post": {
+        "tags": ["Ingredient"],
+        "summary": "Create a new ingredient",
+        "description": "Creates a new ingredient (Zutat).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "ingredient": { "type": "string" }
+                },
+                "required": ["ingredient"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ingredient added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "ingredientId": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing ingredient in request body" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/ingredients/{id}": {
+      "delete": {
+        "tags": ["Ingredient"],
+        "summary": "Delete an ingredient",
+        "description": "Soft deletes an ingredient (Zutat) by its ID.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID of the ingredient",
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Ingredient deleted" },
+          "404": { "description": "Ingredient not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Beverage": {
+        "type": "object",
+        "properties": {
+          "Getraenk_Id": { "type": "integer" },
+          "Typ_Id": { "type": "integer" },
+          "Startgravitation": { "type": "number" },
+          "BeginnFermentation": { "type": "string", "format": "date" },
+          "Abfuellung": { "type": "string", "format": "date" },
+          "Alkoholgehalt": { "type": "number" },
+          "Lager": { "type": "integer" },
+          "Beschreibung": { "type": "string" },
+          "Geloescht": { "type": "boolean" },
+          "Typ": { "type": "string" },
+          "Geschmaecker": { "type": "string" },
+          "Rezept": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Recipe" }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "Benutzer_Id": { "type": "integer" },
+          "Vorname": { "type": "string" },
+          "Nachname": { "type": "string" },
+          "Email": { "type": "string" },
+          "Benutzername": { "type": "string" },
+          "Rolle": { "type": "string" },
+          "Verifiziert": { "type": "boolean" },
+          "Geloescht": { "type": "boolean" }
+        }
+      },
+      "Rating": {
+        "type": "object",
+        "properties": {
+          "Bewertung_Id": { "type": "integer" },
+          "Getraenk_Id": { "type": "integer" },
+          "Benutzer_Id": { "type": "integer" },
+          "Bewertung": { "type": "integer" },
+          "Kommentar": { "type": "string" },
+          "Datum": { "type": "string", "format": "date" },
+          "Geloescht": { "type": "boolean" },
+          "Benutzername": { "type": "string" }
+        }
+      },
+      "Flavor": {
+        "type": "object",
+        "properties": {
+          "Geschmack_Id": { "type": "integer" },
+          "Bezeichnung": { "type": "string" },
+          "Geloescht": { "type": "boolean" }
+        }
+      },
+      "Ingredient": {
+        "type": "object",
+        "properties": {
+          "Zutat_Id": { "type": "integer" },
+          "Bezeichnung": { "type": "string" },
+          "Geloescht": { "type": "boolean" }
+        }
+      },
+      "Recipe": {
+        "type": "object",
+        "properties": {
+          "Rezept_Id": { "type": "integer" },
+          "Getraenk_Id": { "type": "integer" },
+          "Zutat_Id": { "type": "integer" },
+          "Menge": { "type": "string" },
+          "Geloescht": { "type": "boolean" }
         }
       }
     }
