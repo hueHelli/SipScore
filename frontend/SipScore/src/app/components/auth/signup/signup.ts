@@ -8,6 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpService } from '../../../services/http.service';
 
 @Component({
   selector: 'app-signup',
@@ -16,7 +17,11 @@ import { Router } from '@angular/router';
   styleUrl: './signup.scss',
 })
 export class Signup {
-  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private httpService: HttpService
+  ) {}
 
   signupForm!: FormGroup;
   errorMsg: string | null = null;
@@ -27,7 +32,20 @@ export class Signup {
       this.cdr.detectChanges();
       return;
     } else {
-      console.log(this.signupForm);
+      this.httpService
+        .postUser(
+          this.signupForm.value.firstName,
+          this.signupForm.value.lastName,
+          this.signupForm.value.email,
+          this.signupForm.value.username,
+          this.signupForm.value.password
+        )
+        .subscribe(
+          (res: any) => {
+            this.router.navigate(['/verify/' + res.verification.insertId]);
+          },
+          (err) => {}
+        );
     }
   }
 
