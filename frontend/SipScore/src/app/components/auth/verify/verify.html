@@ -1,0 +1,10 @@
+<div class="main">
+  <div class="card">
+    <form [formGroup]="verfyForm" class="form">
+      <h3>E-Mail verifizieren</h3>
+      <input type="number" placeholder="code" required formControlName="code" />
+      <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+      <button type="submit" (click)="onSubmit()">Verifizieren</button>
+    </form>
+  </div>
+</div>
