@@ -34,12 +34,16 @@ best.get("/beverages/best", async (req, res) => {
           g.Geloescht = FALSE
         GROUP BY
           t.Typ_Id, g.Getraenk_Id
-) x
-WHERE x.rn = 1
+        ) x
+        WHERE x.rn = 1
       `
     );
+    const filteredRows = rows.filter(
+      (row) =>
+        row.Durchschnittsbewertung !== null && row.Durchschnittsbewertung > 0
+    );
 
-    return res.status(200).json(rows);
+    return res.status(200).json(filteredRows);
   } catch (error) {
     res.status(500).json({ error: `We fucked up: ${error.message}` });
   }
