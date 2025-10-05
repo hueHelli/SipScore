@@ -1,3 +1,13 @@
 .beverage-card {
   margin: 10px 5px 10px 5px;
+  padding: 5px;
+  border-radius: 4px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  background-color: var(--beverage-card-color);
+  cursor: pointer;
+}
+
+.beverage-card:hover {
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+  transform: scale(1.03);
 }

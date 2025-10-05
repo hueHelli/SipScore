@@ -1,1 +1,7 @@
-<p>beverage works!</p>
+<div class="main">
+  <div *ngIf="beverages" class="card">
+    <div *ngFor="let beverage of beverages">
+      <app-beverageCard [beverage]=""></app-beverageCard>
+    </div>
+  </div>
+</div>

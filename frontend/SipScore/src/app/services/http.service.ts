@@ -50,6 +50,10 @@ export class HttpService {
     return this.http.get(this.apiSession, { withCredentials: true });
   }
 
+  getBeverages() {
+    return this.http.get(this.apiBeverage, { withCredentials: true });
+  }
+
   getBestBeverages() {
     return this.http.get(this.apiBeverage + '/best', { withCredentials: true });
   }
