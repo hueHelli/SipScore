@@ -34,14 +34,30 @@ best.get("/beverages/best", async (req, res) => {
           g.Geloescht = FALSE
         GROUP BY
           t.Typ_Id, g.Getraenk_Id
-        ) x
-        WHERE x.rn = 1
+      ) x
+      WHERE x.rn = 1
       `
     );
+
+    // Filter im JS: Nur Getränke mit Bewertung > 0 und nicht null
     const filteredRows = rows.filter(
       (row) =>
         row.Durchschnittsbewertung !== null && row.Durchschnittsbewertung > 0
     );
+
+    // Geschmäcker für jedes Getränk holen
+    for (const row of filteredRows) {
+      const [geschmackRows] = await pool.query(
+        `
+        SELECT gs.Geschmack
+        FROM Getraenk_Geschmack gg
+        JOIN Geschmack gs ON gg.Geschmack_Id = gs.Geschmack_Id
+        WHERE gg.Getraenk_Id = ?
+        `,
+        [row.Getraenk_Id]
+      );
+      row.Geschmaecker = geschmackRows.map((g) => g.Geschmack);
+    }
 
     return res.status(200).json(filteredRows);
   } catch (error) {
