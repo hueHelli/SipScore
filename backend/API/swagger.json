@@ -182,7 +182,7 @@
                 "type": "object",
                 "properties": {
                   "request": { "type": "object" },
-                  "action": { "type": "string" }
+                  "action": { "type": "verify || update || password" }
                 },
                 "required": ["request", "action"]
               }
@@ -193,7 +193,10 @@
           "200": {
             "description": "User updated / Email verified / Password Changed"
           },
-          "400": { "description": "You fucked up: {error}" }
+          "400": { "description": "You fucked up: {error}" },
+          "403": { "description": "Wrong Password" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Server error" }
         }
       },
       "delete": {

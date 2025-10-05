@@ -136,7 +136,8 @@ user.put("/users/:id", async (req, res) => {
   const { request, action = "update" } = req.body;
 
   try {
-    if (action === "verifyEmail") {
+    if (action === "verify") {
+      const { code } = request;
       const [user] = await pool.query(
         `
         SELECT * FROM Benutzer
@@ -149,7 +150,7 @@ user.put("/users/:id", async (req, res) => {
         return res.status(404).json({ error: "User not found" });
       }
 
-      if (Number(user[0].Code) !== Number(request.code)) {
+      if (Number(user[0].Code) !== Number(code)) {
         return res.status(400).json({ error: "Invalid verification code" });
       }
 
@@ -189,7 +190,35 @@ user.put("/users/:id", async (req, res) => {
 
       return res.status(200).json({ message: "User updated" });
     } else if (action === "password") {
-      
+      const { oldPassword, newPassword } = req.body;
+
+      const [existingUser] = await pool.query(
+        `
+        SELECT * FROM Benutzer
+        WHERE Benutzer_Id = ?
+        `,
+        [id]
+      );
+
+      if (!existingUser || existingUser.length === 0) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      if (!bcrypt.compareSync(oldPassword, existingUser[0].Passwort)) {
+        return res.status(403).json({ error: "Old password is incorrect" });
+      }
+
+      const newPasswordHash = bcrypt.hashSync(newPassword, 10);
+
+      await pool.query(
+        `
+        UPDATE Benutzer
+        SET Passwort = ?
+        WHERE Benutzer_Id = ?
+        `,
+        [newPasswordHash, id]
+      );
+      return res.status(200).json({ message: "Password updated" });
     }
   } catch (error) {
     return res.status(500).json({ error: `We fucked up: ${error.message}` });
