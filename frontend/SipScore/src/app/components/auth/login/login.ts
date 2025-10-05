@@ -28,7 +28,6 @@ export class Login {
   errorMsg: string | null = null;
 
   onSubmit() {
-    console.log(this.loginForm.value);
     if (this.loginForm.invalid) {
       this.errorMsg = 'Ungültige Angabe';
       this.cdr.detectChanges();
@@ -43,6 +42,7 @@ export class Login {
           },
           (err) => {
             this.errorMsg = 'Falscher Benutzername oder Passwort';
+            this.cdr.detectChanges();
           }
         );
     }
@@ -53,6 +53,13 @@ export class Login {
   }
 
   ngOnInit(): void {
+    this.httpService.getSession().subscribe((res: any) => {
+      if (res.user) {
+        this.userService.setUser(res.user);
+        this.router.navigate(['/home']);
+      }
+    });
+
     this.loginForm = new FormGroup({
       credential: new FormControl('', []),
       password: new FormControl('', []),

@@ -25,8 +25,10 @@ export class Signup {
 
   signupForm!: FormGroup;
   errorMsg: string | null = null;
+  loading: boolean = false;
 
   onSubmit() {
+    this.loading = true;
     if (this.signupForm.invalid) {
       this.errorMsg = 'Ungültige Angabe';
       this.cdr.detectChanges();
@@ -45,8 +47,8 @@ export class Signup {
             // Have to wait for backend bc the backend guy fucked up
             // (he gave me a text as respone like "User created with id 14" instead of a json with the id)
             // such a idiot
-            //this.router.navigate(['/verify/' + res.verification.insertId]);
-            this.router.navigate(['/verify/' + 14]);
+            // Okay now i can carry on ;) thx backend guy
+            this.router.navigate(['/verify/' + res.id]);
           },
           (err) => {}
         );
@@ -69,6 +71,7 @@ export class Signup {
   }
 
   ngOnInit(): void {
+    this.loading = false;
     this.signupForm = new FormGroup({
       firstName: new FormControl('', [Validators.required]),
       lastName: new FormControl('', [Validators.required]),

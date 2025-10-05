@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +10,11 @@ export class UserService {
     lastName: '',
     email: '',
     username: '',
-    role: '',
+    role: null,
   };
+
+  private usernameSubject = new BehaviorSubject<string | null>(null);
+
   setUser(user: {
     Benutzer_Id: number;
     Benutzername: string;
@@ -27,6 +31,26 @@ export class UserService {
     this.user.email = user.Email;
     this.user.username = user.Benutzername;
     this.user.role = user.Rolle.data;
-    console.log(this.user);
+
+    this.usernameSubject.next(this.user.username);
+  }
+
+  clearUser() {
+    this.user = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      username: '',
+      role: null,
+    };
+    this.usernameSubject.next(null);
+  }
+
+  getUserRole() {
+    return this.user.role;
+  }
+
+  getUserName(): Observable<string | null> {
+    return this.usernameSubject.asObservable();
   }
 }

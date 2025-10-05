@@ -1,13 +1,25 @@
 .nav-main {
   display: flex;
+  justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
   padding: 10px;
   height: 80px;
   width: 100%;
   background-color: var(--nav-color);
+  box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.1);
 
-  .end {
-    align-self: flex-end;
+  .nav-start {
+    justify-self: flex-start;
+  }
+
+  .nav-end {
+    display: flex;
+    align-items: center;
+
+    * {
+      margin-left: 10px;
+      margin-top: 0px;
+    }
   }
 }

@@ -3,7 +3,7 @@
   --card-color: #e8e6e1;
   --light-accent-color: #d6c7b1;
   --dark-accent-color: #b8a48b;
-  --primar-text-color: #2f2f2f;
+  --primary-text-color: #2f2f2f;
   --secondary-text-color: #6c6c6c;
   --nav-color: #f9d968;
 }
@@ -39,7 +39,11 @@ body {
 h1,
 h2,
 h3 {
-  color: var(--primar-text-color);
+  color: var(--primary-text-color);
+}
+
+.text-primary {
+  color: var(--primary-text-color);
 }
 
 .error {
@@ -50,11 +54,12 @@ h3 {
 
 button {
   background-color: var(--light-accent-color);
-  color: var(--primar-text-color);
+  color: var(--primary-text-color);
   border: 2px solid var(--light-accent-color);
   border-radius: 5px;
   padding: 7px 15px;
   margin-top: 5px;
+  font-size: medium;
   cursor: pointer;
 }
 
