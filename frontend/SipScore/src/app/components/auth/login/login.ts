@@ -7,6 +7,8 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpService } from '../../../services/http.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -15,18 +17,34 @@ import { Router } from '@angular/router';
   styleUrl: './login.scss',
 })
 export class Login {
-  constructor(private router: Router, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef,
+    private httpService: HttpService,
+    private userService: UserService
+  ) {}
 
   loginForm!: FormGroup;
   errorMsg: string | null = null;
 
   onSubmit() {
+    console.log(this.loginForm.value);
     if (this.loginForm.invalid) {
       this.errorMsg = 'Ungültige Angabe';
       this.cdr.detectChanges();
       return;
     } else {
-      console.log(this.loginForm);
+      this.httpService
+        .login(this.loginForm.value.credential, this.loginForm.value.password)
+        .subscribe(
+          (res: any) => {
+            this.userService.setUser(res.user);
+            this.router.navigate(['/home']);
+          },
+          (err) => {
+            this.errorMsg = 'Falscher Benutzername oder Passwort';
+          }
+        );
     }
   }
 
@@ -36,7 +54,7 @@ export class Login {
 
   ngOnInit(): void {
     this.loginForm = new FormGroup({
-      username: new FormControl('', []),
+      credential: new FormControl('', []),
       password: new FormControl('', []),
     });
   }

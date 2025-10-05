@@ -9,22 +9,24 @@ export class UserService {
     lastName: '',
     email: '',
     username: '',
-    password: '',
-    role: 'user',
+    role: '',
   };
-  setUser(
-    firstName: string,
-    lastName: string,
-    email: string,
-    username: string,
-    password: string,
-    role: string
-  ) {
-    this.user.firstName = firstName;
-    this.user.lastName = lastName;
-    this.user.email = email;
-    this.user.username = username;
-    this.user.password = password;
-    this.user.role = role;
+  setUser(user: {
+    Benutzer_Id: number;
+    Benutzername: string;
+    Code: number;
+    Email: string;
+    Geloscht: number;
+    Nachname: string;
+    Rolle: any;
+    Verifiziert: number;
+    Vorname: string;
+  }) {
+    this.user.firstName = user.Vorname;
+    this.user.lastName = user.Nachname;
+    this.user.email = user.Email;
+    this.user.username = user.Benutzername;
+    this.user.role = user.Rolle.data;
+    console.log(this.user);
   }
 }

@@ -7,7 +7,8 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 export class HttpService {
   constructor(private http: HttpClient) {}
   apiUrl = 'http://localhost:3000/api/';
-  apiUser = this.apiUrl + 'user';
+  apiUser = this.apiUrl + 'users';
+  apiSession = this.apiUrl + 'sessions';
 
   postUser(
     firstName: string,
@@ -30,5 +31,13 @@ export class HttpService {
       request: { code: code },
       action: 'verify',
     });
+  }
+
+  login(credential: string, password: string) {
+    return this.http.post(
+      this.apiSession,
+      { credential, password },
+      { withCredentials: true }
+    );
   }
 }

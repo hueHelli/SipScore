@@ -42,7 +42,11 @@ export class Signup {
         )
         .subscribe(
           (res: any) => {
-            this.router.navigate(['/verify/' + res.verification.insertId]);
+            // Have to wait for backend bc the backend guy fucked up
+            // (he gave me a text as respone like "User created with id 14" instead of a json with the id)
+            // such a idiot
+            //this.router.navigate(['/verify/' + res.verification.insertId]);
+            this.router.navigate(['/verify/' + 14]);
           },
           (err) => {}
         );
