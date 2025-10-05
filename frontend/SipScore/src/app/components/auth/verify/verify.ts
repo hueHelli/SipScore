@@ -8,6 +8,8 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { HttpService } from '../../../services/http.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-verify',
@@ -16,15 +18,40 @@ import { CommonModule } from '@angular/common';
   styleUrl: './verify.scss',
 })
 export class Verify {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private httpService: HttpService,
+    private userService: UserService
+  ) {}
 
   verfyForm!: FormGroup;
   errorMsg: string | null = null;
 
-  onSubmit() {}
+  onSubmit() {
+    if (this.verfyForm.invalid) {
+      this.errorMsg = 'Ungültige Angabe';
+      return;
+    } else {
+      this.httpService
+        .verifyMail(
+          Number(this.router.url.split('/')[2]),
+          this.verfyForm.value.code
+        )
+        .subscribe(
+          (res: any) => {
+            // TODO sending user but have to wait until backend is fixed
+            console.log(res);
+            this.userService.setUser(res.user);
+            this.router.navigate(['/home']);
+          },
+          (err) => {
+            this.errorMsg = 'Falscher Code';
+          }
+        );
+    }
+  }
 
   ngOnInit() {
-    console.log(this.router.url.split('/')[2]);
     this.verfyForm = new FormGroup({
       code: new FormControl('', [Validators.required]),
     });
