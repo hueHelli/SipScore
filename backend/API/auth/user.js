@@ -4,6 +4,9 @@ const bcrypt = require("bcrypt");
 const pool = require("../pool");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const cookie = require("../session");
+
+user.use(cookie);
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -163,6 +166,7 @@ user.put("/users/:id", async (req, res) => {
         [id]
       );
 
+      req.session.user = user[0];
       return res.status(200).json({ message: "Email verified successfully" });
     } else if (action === "update") {
       const { firstName, lastName, email, username } = request;

@@ -9,6 +9,8 @@ const promote = require("./auth/role");
 const beverage = require("./beverage/beverage");
 const best = require("./beverage/best");
 const rating = require("./beverage/rating");
+const flavor = require("./beverage/flavor");
+const ingredient = require("./beverage/ingredient");
 const bcrypt = require("bcrypt");
 
 app.use(express.json());
@@ -25,6 +27,8 @@ app.use("/api", promote);
 app.use("/api", best);
 app.use("/api", beverage);
 app.use("/api", rating);
+app.use("/api", flavor);
+app.use("/api", ingredient);
 
 app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
